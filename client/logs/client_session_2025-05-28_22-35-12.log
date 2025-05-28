@@ -1,0 +1,34 @@
+2025-05-28 22:35:12,359 - ClientApp - INFO - Запуск клиентского приложения...
+2025-05-28 22:35:12,374 - ClientApp - INFO - Инициализация главного окна клиента...
+2025-05-28 22:35:12,379 - ClientApp - INFO - Изменение состояния UI на: disconnected
+2025-05-28 22:35:12,379 - ClientApp - INFO - UI клиента инициализирован.
+2025-05-28 22:35:12,455 - ClientApp - INFO - Главное окно клиента отображено.
+2025-05-28 22:35:43,333 - ClientApp - INFO - Попытка подключения к 127.0.0.1:65432
+2025-05-28 22:35:43,335 - ClientApp - INFO - Изменение состояния UI на: connecting_to_server
+2025-05-28 22:35:43,347 - ClientApp - INFO - Успешно подключено к серверу 127.0.0.1:65432
+2025-05-28 22:35:43,347 - ClientApp - INFO - Изменение состояния UI на: awaiting_login
+2025-05-28 22:35:46,837 - ClientApp - INFO - Отправка запроса на логин с никнеймом: 123
+2025-05-28 22:35:46,837 - ClientApp - INFO - Изменение состояния UI на: logging_in
+2025-05-28 22:35:46,838 - ClientApp - DEBUG - Отправлено на сервер: {"type": "login", "payload": {"username": "123"}}
+2025-05-28 22:35:46,839 - ClientApp - DEBUG - on_ready_read: текущий буфер: "{"type": "login_status", "payload": {"status": "success", "message": "\u0423\u0441\u043f\u0435\u0448\u043d\u044b\u0439 \u0432\u0445\u043e\u0434.", "username": "123"}}
+"
+2025-05-28 22:35:46,839 - ClientApp - INFO - Получено полное сообщение от сервера: {"type": "login_status", "payload": {"status": "success", "message": "\u0423\u0441\u043f\u0435\u0448\u043d\u044b\u0439 \u0432\u0445\u043e\u0434.", "username": "123"}}
+2025-05-28 22:35:46,839 - ClientApp - INFO - Логин успешен как 123. Сообщение от сервера: Успешный вход.
+2025-05-28 22:35:46,840 - ClientApp - INFO - Изменение состояния UI на: chatting
+2025-05-28 22:43:03,350 - ClientApp - DEBUG - on_ready_read: текущий буфер: "{"type": "incoming_message", "payload": {"sender": "222", "text": "\u0441\u043e\u0441\u0438"}}
+"
+2025-05-28 22:43:03,350 - ClientApp - INFO - Получено полное сообщение от сервера: {"type": "incoming_message", "payload": {"sender": "222", "text": "\u0441\u043e\u0441\u0438"}}
+2025-05-28 22:43:03,350 - ClientApp - INFO - Получено сообщение от 222: соси
+2025-05-28 22:43:17,613 - ClientApp - INFO - Отправка личного сообщения для 222: чё
+2025-05-28 22:43:17,613 - ClientApp - DEBUG - Отправлено на сервер: {"type": "private_message", "payload": {"recipient": "222", "text": "\u0447\u0451"}}
+2025-05-28 22:43:31,104 - ClientApp - DEBUG - on_ready_read: текущий буфер: "{"type": "incoming_message", "payload": {"sender": "222", "text": "\u0432\u0441\u0451"}}
+"
+2025-05-28 22:43:31,104 - ClientApp - INFO - Получено полное сообщение от сервера: {"type": "incoming_message", "payload": {"sender": "222", "text": "\u0432\u0441\u0451"}}
+2025-05-28 22:43:31,105 - ClientApp - INFO - Получено сообщение от 222: всё
+2025-05-28 22:43:43,405 - ClientApp - INFO - Отправка личного сообщения для 222: ок
+2025-05-28 22:43:43,405 - ClientApp - DEBUG - Отправлено на сервер: {"type": "private_message", "payload": {"recipient": "222", "text": "\u043e\u043a"}}
+2025-05-28 22:43:49,798 - ClientApp - DEBUG - on_ready_read: текущий буфер: "{"type": "incoming_message", "payload": {"sender": "222", "text": "\u043f\u043e\u0447\u0435\u043c\u0443"}}
+"
+2025-05-28 22:43:49,798 - ClientApp - INFO - Получено полное сообщение от сервера: {"type": "incoming_message", "payload": {"sender": "222", "text": "\u043f\u043e\u0447\u0435\u043c\u0443"}}
+2025-05-28 22:43:49,798 - ClientApp - INFO - Получено сообщение от 222: почему
+2025-05-28 23:18:22,749 - ClientApp - INFO - Клиентское приложение завершено с кодом: 0

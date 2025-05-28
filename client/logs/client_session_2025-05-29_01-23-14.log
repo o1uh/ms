@@ -1,0 +1,22 @@
+2025-05-29 01:23:14,078 - ClientApp - INFO - Запуск клиентского приложения...
+2025-05-29 01:23:14,097 - ClientApp - INFO - Инициализация главного окна клиента...
+2025-05-29 01:23:14,103 - ClientApp - INFO - Изменение состояния UI на: disconnected
+2025-05-29 01:23:14,104 - ClientApp - INFO - UI клиента инициализирован.
+2025-05-29 01:23:14,183 - ClientApp - INFO - Главное окно клиента отображено.
+2025-05-29 01:23:16,717 - ClientApp - INFO - Попытка подключения к 127.0.0.1:65432
+2025-05-29 01:23:16,719 - ClientApp - INFO - Изменение состояния UI на: connecting_to_server
+2025-05-29 01:23:16,722 - ClientApp - INFO - Успешно подключено к серверу 127.0.0.1:65432
+2025-05-29 01:23:16,722 - ClientApp - INFO - Изменение состояния UI на: awaiting_auth
+2025-05-29 01:23:19,997 - ClientApp - INFO - Отправка запроса на вход для: 1111
+2025-05-29 01:23:19,997 - ClientApp - INFO - Изменение состояния UI на: authenticating
+2025-05-29 01:23:19,998 - ClientApp - DEBUG - Отправлено на сервер: {"type": "login", "payload": {"username": "1111", "password": "1111"}}
+2025-05-29 01:23:20,158 - ClientApp - DEBUG - on_ready_read: текущий буфер (до обработки split): "{"type": "login_status", "payload": {"status": "success", "message": "Успешный вход.", "username": "1111", "user_id": 1}}
+"
+2025-05-29 01:23:20,158 - ClientApp - INFO - Получено полное сообщение от сервера: {"type": "login_status", "payload": {"status": "success", "message": "Успешный вход.", "username": "1111", "user_id": 1}}
+2025-05-29 01:23:20,158 - ClientApp - INFO - Логин успешен как 1111 (ID: 1). Сообщение: Успешный вход.
+2025-05-29 01:23:20,158 - ClientApp - INFO - Изменение состояния UI на: chatting
+2025-05-29 01:23:41,164 - ClientApp - DEBUG - on_ready_read: текущий буфер (до обработки split): "{"type": "incoming_message", "payload": {"sender": "2222", "text": "132", "chat_id": 1, "message_id": 1}}
+"
+2025-05-29 01:23:41,164 - ClientApp - INFO - Получено полное сообщение от сервера: {"type": "incoming_message", "payload": {"sender": "2222", "text": "132", "chat_id": 1, "message_id": 1}}
+2025-05-29 01:23:41,164 - ClientApp - INFO - Получено сообщение от 2222: 132
+2025-05-29 01:23:45,041 - ClientApp - INFO - Клиентское приложение завершено с кодом: 0

@@ -1,0 +1,23 @@
+2025-05-29 00:43:40,274 - ServerApp - INFO - Запуск серверного приложения...
+2025-05-29 00:43:40,275 - ServerApp - INFO - Сервер запущен и слушает на 127.0.0.1:65432
+2025-05-29 00:43:40,275 - ServerApp - INFO - Для остановки сервера нажмите Ctrl+C в этой консоли.
+2025-05-29 00:43:47,125 - ServerApp - INFO - Новое подключение от ('127.0.0.1', 63650)
+2025-05-29 00:43:47,145 - ServerApp - INFO - Успешное подключение к базе данных PostgreSQL.
+2025-05-29 00:44:07,681 - ServerApp - DEBUG - Получено от ('127.0.0.1', 63650) (до аутентификации): {"type": "register", "payload": {"username": "1111", "password": "1111"}}
+2025-05-29 00:44:07,989 - ServerApp - ERROR - Ошибка при создании пользователя '1111' в БД: value too long for type character varying(255)
+Traceback (most recent call last):
+  File "C:\Users\PC\Desktop\mx\labs\ос\ms\server\main_server.py", line 45, in create_user_in_db
+    cur.execute(
+    ~~~~~~~~~~~^
+        "INSERT INTO users (username, password_hash, salt) VALUES (%s, %s, %s) RETURNING user_id",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        (username, password_hash, salt)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+psycopg2.errors.StringDataRightTruncation: value too long for type character varying(255)
+
+2025-05-29 00:44:07,994 - ServerApp - DEBUG - Отправлено ('127.0.0.1', 63650): {"type": "register_status", "payload": {"status": "error", "message": "\u041e\u0448\u0438\u0431\u043a\u0430 \u043f\u0440\u0438 \u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0430\u0446\u0438\u0438 \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f."}}
+2025-05-29 00:47:00,789 - ServerApp - INFO - Получен сигнал остановки (KeyboardInterrupt)...
+2025-05-29 00:47:00,789 - ServerApp - INFO - Сервер останавливается...
+2025-05-29 00:47:00,789 - ServerApp - INFO - Сервер остановлен.

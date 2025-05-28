@@ -1,0 +1,58 @@
+2025-05-29 00:48:27,371 - ClientApp - INFO - Запуск клиентского приложения...
+2025-05-29 00:48:27,386 - ClientApp - INFO - Инициализация главного окна клиента...
+2025-05-29 00:48:27,391 - ClientApp - INFO - Изменение состояния UI на: disconnected
+2025-05-29 00:48:27,392 - ClientApp - INFO - UI клиента инициализирован.
+2025-05-29 00:48:27,469 - ClientApp - INFO - Главное окно клиента отображено.
+2025-05-29 00:48:28,959 - ClientApp - INFO - Попытка подключения к 127.0.0.1:65432
+2025-05-29 00:48:28,959 - ClientApp - INFO - Изменение состояния UI на: connecting_to_server
+2025-05-29 00:48:28,962 - ClientApp - INFO - Успешно подключено к серверу 127.0.0.1:65432
+2025-05-29 00:48:28,962 - ClientApp - INFO - Изменение состояния UI на: awaiting_auth
+2025-05-29 00:48:34,127 - ClientApp - INFO - Отправка запроса на вход для: 1111
+2025-05-29 00:48:34,127 - ClientApp - INFO - Изменение состояния UI на: authenticating
+2025-05-29 00:48:34,128 - ClientApp - DEBUG - Отправлено на сервер: {"type": "login", "payload": {"username": "1111", "password": "222222"}}
+2025-05-29 00:48:34,288 - ClientApp - DEBUG - on_ready_read: текущий буфер (до обработки split): "{"type": "login_status", "payload": {"status": "error", "message": "\u041d\u0435\u0432\u0435\u0440\u043d\u043e\u0435 \u0438\u043c\u044f \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f \u0438\u043b\u0438 \u043f\u0430\u0440\u043e\u043b\u044c."}}
+"
+2025-05-29 00:48:34,288 - ClientApp - INFO - Получено полное сообщение от сервера: {"type": "login_status", "payload": {"status": "error", "message": "\u041d\u0435\u0432\u0435\u0440\u043d\u043e\u0435 \u0438\u043c\u044f \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f \u0438\u043b\u0438 \u043f\u0430\u0440\u043e\u043b\u044c."}}
+2025-05-29 00:48:34,288 - ClientApp - WARNING - Ошибка логина. Сообщение: Неверное имя пользователя или пароль.
+2025-05-29 00:48:35,585 - ClientApp - INFO - Изменение состояния UI на: awaiting_auth
+2025-05-29 00:48:38,111 - ClientApp - INFO - Отправка запроса на вход для: 1111
+2025-05-29 00:48:38,111 - ClientApp - INFO - Изменение состояния UI на: authenticating
+2025-05-29 00:48:38,111 - ClientApp - DEBUG - Отправлено на сервер: {"type": "login", "payload": {"username": "1111", "password": "1111"}}
+2025-05-29 00:48:38,269 - ClientApp - DEBUG - on_ready_read: текущий буфер (до обработки split): "{"type": "login_status", "payload": {"status": "error", "message": "\u041f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044c '1111' \u0443\u0436\u0435 \u0432 \u0441\u0435\u0442\u0438."}}
+"
+2025-05-29 00:48:38,269 - ClientApp - INFO - Получено полное сообщение от сервера: {"type": "login_status", "payload": {"status": "error", "message": "\u041f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044c '1111' \u0443\u0436\u0435 \u0432 \u0441\u0435\u0442\u0438."}}
+2025-05-29 00:48:38,269 - ClientApp - WARNING - Ошибка логина. Сообщение: Пользователь '1111' уже в сети.
+2025-05-29 00:48:39,681 - ClientApp - INFO - Изменение состояния UI на: awaiting_auth
+2025-05-29 00:48:48,231 - ClientApp - INFO - Отправка запроса на вход для: 2222
+2025-05-29 00:48:48,231 - ClientApp - INFO - Изменение состояния UI на: authenticating
+2025-05-29 00:48:48,231 - ClientApp - DEBUG - Отправлено на сервер: {"type": "login", "payload": {"username": "2222", "password": "2222"}}
+2025-05-29 00:48:48,233 - ClientApp - DEBUG - on_ready_read: текущий буфер (до обработки split): "{"type": "login_status", "payload": {"status": "error", "message": "\u041d\u0435\u0432\u0435\u0440\u043d\u043e\u0435 \u0438\u043c\u044f \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f \u0438\u043b\u0438 \u043f\u0430\u0440\u043e\u043b\u044c."}}
+"
+2025-05-29 00:48:48,233 - ClientApp - INFO - Получено полное сообщение от сервера: {"type": "login_status", "payload": {"status": "error", "message": "\u041d\u0435\u0432\u0435\u0440\u043d\u043e\u0435 \u0438\u043c\u044f \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f \u0438\u043b\u0438 \u043f\u0430\u0440\u043e\u043b\u044c."}}
+2025-05-29 00:48:48,233 - ClientApp - WARNING - Ошибка логина. Сообщение: Неверное имя пользователя или пароль.
+2025-05-29 00:48:49,641 - ClientApp - INFO - Изменение состояния UI на: awaiting_auth
+2025-05-29 00:48:51,263 - ClientApp - INFO - Отправка запроса на регистрацию для: 2222
+2025-05-29 00:48:51,263 - ClientApp - INFO - Изменение состояния UI на: authenticating
+2025-05-29 00:48:51,263 - ClientApp - DEBUG - Отправлено на сервер: {"type": "register", "payload": {"username": "2222", "password": "2222"}}
+2025-05-29 00:48:51,425 - ClientApp - DEBUG - on_ready_read: текущий буфер (до обработки split): "{"type": "register_status", "payload": {"status": "success", "message": "\u041f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044c '2222' \u0443\u0441\u043f\u0435\u0448\u043d\u043e \u0437\u0430\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u043e\u0432\u0430\u043d. \u0422\u0435\u043f\u0435\u0440\u044c \u0432\u044b \u043c\u043e\u0436\u0435\u0442\u0435 \u0432\u043e\u0439\u0442\u0438."}}
+"
+2025-05-29 00:48:51,425 - ClientApp - INFO - Получено полное сообщение от сервера: {"type": "register_status", "payload": {"status": "success", "message": "\u041f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044c '2222' \u0443\u0441\u043f\u0435\u0448\u043d\u043e \u0437\u0430\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u043e\u0432\u0430\u043d. \u0422\u0435\u043f\u0435\u0440\u044c \u0432\u044b \u043c\u043e\u0436\u0435\u0442\u0435 \u0432\u043e\u0439\u0442\u0438."}}
+2025-05-29 00:48:51,426 - ClientApp - INFO - Регистрация успешна. Сообщение: Пользователь '2222' успешно зарегистрирован. Теперь вы можете войти.
+2025-05-29 00:48:52,505 - ClientApp - INFO - Изменение состояния UI на: awaiting_auth
+2025-05-29 00:48:53,223 - ClientApp - INFO - Отправка запроса на вход для: 2222
+2025-05-29 00:48:53,223 - ClientApp - INFO - Изменение состояния UI на: authenticating
+2025-05-29 00:48:53,223 - ClientApp - DEBUG - Отправлено на сервер: {"type": "login", "payload": {"username": "2222", "password": "2222"}}
+2025-05-29 00:48:53,384 - ClientApp - DEBUG - on_ready_read: текущий буфер (до обработки split): "{"type": "login_status", "payload": {"status": "success", "message": "\u0423\u0441\u043f\u0435\u0448\u043d\u044b\u0439 \u0432\u0445\u043e\u0434.", "username": "2222", "user_id": 2}}
+"
+2025-05-29 00:48:53,384 - ClientApp - INFO - Получено полное сообщение от сервера: {"type": "login_status", "payload": {"status": "success", "message": "\u0423\u0441\u043f\u0435\u0448\u043d\u044b\u0439 \u0432\u0445\u043e\u0434.", "username": "2222", "user_id": 2}}
+2025-05-29 00:48:53,384 - ClientApp - INFO - Логин успешен как 2222 (ID: 2). Сообщение: Успешный вход.
+2025-05-29 00:48:53,385 - ClientApp - INFO - Изменение состояния UI на: chatting
+2025-05-29 00:49:16,135 - ClientApp - INFO - Отправка личного сообщения для 2222: 222
+2025-05-29 00:49:16,135 - ClientApp - DEBUG - Отправлено на сервер: {"type": "private_message", "payload": {"recipient": "2222", "text": "222"}}
+2025-05-29 00:49:16,136 - ClientApp - DEBUG - on_ready_read: текущий буфер (до обработки split): "{"type": "incoming_message", "payload": {"sender": "2222", "text": "222"}}
+"
+2025-05-29 00:49:16,136 - ClientApp - INFO - Получено полное сообщение от сервера: {"type": "incoming_message", "payload": {"sender": "2222", "text": "222"}}
+2025-05-29 00:49:16,136 - ClientApp - INFO - Получено сообщение от 2222: 222
+2025-05-29 00:50:07,575 - ClientApp - INFO - Отправка личного сообщения для 1111: 3
+2025-05-29 00:50:07,575 - ClientApp - DEBUG - Отправлено на сервер: {"type": "private_message", "payload": {"recipient": "1111", "text": "3"}}
+2025-05-29 00:52:04,987 - ClientApp - INFO - Клиентское приложение завершено с кодом: 0
