@@ -1,0 +1,17 @@
+2025-05-29 01:52:27,217 - ClientApp - INFO - Запуск клиентского приложения...
+2025-05-29 01:52:27,234 - ClientApp - INFO - Инициализация главного окна клиента...
+2025-05-29 01:52:27,242 - ClientApp - INFO - Изменение состояния UI на: disconnected
+2025-05-29 01:52:27,244 - ClientApp - INFO - UI клиента инициализирован.
+2025-05-29 01:52:27,332 - ClientApp - INFO - Главное окно клиента отображено.
+2025-05-29 01:52:34,132 - ClientApp - INFO - Попытка подключения к 127.0.0.1:65432
+2025-05-29 01:52:34,134 - ClientApp - INFO - Изменение состояния UI на: connecting_to_server
+2025-05-29 01:52:34,137 - ClientApp - INFO - Успешно подключено к серверу 127.0.0.1:65432
+2025-05-29 01:52:34,137 - ClientApp - INFO - Изменение состояния UI на: awaiting_auth
+2025-05-29 01:52:38,692 - ClientApp - INFO - Отправка запроса на вход для: 2222
+2025-05-29 01:52:38,692 - ClientApp - INFO - Изменение состояния UI на: authenticating
+2025-05-29 01:52:38,693 - ClientApp - DEBUG - Отправлено на сервер: {"type": "login", "payload": {"username": "2222", "password": "2222"}}
+2025-05-29 01:52:38,854 - ClientApp - DEBUG - on_ready_read: текущий буфер (до обработки split): "{"type": "login_status", "payload": {"status": "success", "message": "Успешный вход.", "username": "2222", "user_id": 2}}
+"
+2025-05-29 01:52:38,854 - ClientApp - INFO - Получено полное сообщение от сервера: {"type": "login_status", "payload": {"status": "success", "message": "Успешный вход.", "username": "2222", "user_id": 2}}
+2025-05-29 01:52:38,854 - ClientApp - INFO - Логин успешен как 2222 (ID: 2). Сообщение: Успешный вход.
+2025-05-29 01:52:38,854 - ClientApp - INFO - Изменение состояния UI на: chatting

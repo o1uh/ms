@@ -1,0 +1,22 @@
+2025-05-29 01:30:51,404 - ClientApp - INFO - Запуск клиентского приложения...
+2025-05-29 01:30:51,422 - ClientApp - INFO - Инициализация главного окна клиента...
+2025-05-29 01:30:51,428 - ClientApp - INFO - Изменение состояния UI на: disconnected
+2025-05-29 01:30:51,429 - ClientApp - INFO - UI клиента инициализирован.
+2025-05-29 01:30:51,507 - ClientApp - INFO - Главное окно клиента отображено.
+2025-05-29 01:30:53,861 - ClientApp - INFO - Попытка подключения к 127.0.0.1:65432
+2025-05-29 01:30:53,861 - ClientApp - INFO - Изменение состояния UI на: connecting_to_server
+2025-05-29 01:30:53,864 - ClientApp - INFO - Успешно подключено к серверу 127.0.0.1:65432
+2025-05-29 01:30:53,864 - ClientApp - INFO - Изменение состояния UI на: awaiting_auth
+2025-05-29 01:30:58,853 - ClientApp - INFO - Отправка запроса на вход для: 2222
+2025-05-29 01:30:58,853 - ClientApp - INFO - Изменение состояния UI на: authenticating
+2025-05-29 01:30:58,854 - ClientApp - DEBUG - Отправлено на сервер: {"type": "login", "payload": {"username": "2222", "password": "2222"}}
+2025-05-29 01:30:59,014 - ClientApp - DEBUG - on_ready_read: текущий буфер (до обработки split): "{"type": "login_status", "payload": {"status": "success", "message": "Успешный вход.", "username": "2222", "user_id": 2}}
+"
+2025-05-29 01:30:59,014 - ClientApp - INFO - Получено полное сообщение от сервера: {"type": "login_status", "payload": {"status": "success", "message": "Успешный вход.", "username": "2222", "user_id": 2}}
+2025-05-29 01:30:59,015 - ClientApp - INFO - Логин успешен как 2222 (ID: 2). Сообщение: Успешный вход.
+2025-05-29 01:30:59,015 - ClientApp - INFO - Изменение состояния UI на: chatting
+2025-05-29 01:51:06,589 - ClientApp - ERROR - Ошибка сокета: SocketError.RemoteHostClosedError - The remote host closed the connection
+2025-05-29 01:51:06,590 - ClientApp - INFO - Изменение состояния UI на: disconnected
+2025-05-29 01:51:06,590 - ClientApp - INFO - Отключено от сервера.
+2025-05-29 01:51:06,590 - ClientApp - INFO - Изменение состояния UI на: disconnected
+2025-05-29 01:51:19,264 - ClientApp - INFO - Клиентское приложение завершено с кодом: 0

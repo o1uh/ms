@@ -118,3 +118,124 @@ def save_message_to_db(conn, chat_id, sender_id, content_type, content, logger):
         conn.rollback()
         logger.error(f"Ошибка при сохранении сообщения в БД (chat_id: {chat_id}, sender_id: {sender_id}): {e}", exc_info=True)
         return None
+
+def get_user_chats(conn, user_id, logger):
+    """Получает список чатов, в которых участвует пользователь."""
+    chats_info = []
+    try:
+        with conn.cursor() as cur:
+            # Выбираем чаты, в которых состоит пользователь
+            # Для каждого чата определяем его тип и других участников (для direct)
+            # или название (для group)
+            # Также получаем последнее сообщение и его время
+            cur.execute("""
+                SELECT
+                    c.chat_id,
+                    c.chat_type,
+                    c.chat_name, 
+                    c.last_message_at,
+                    (SELECT m.content FROM messages m WHERE m.chat_id = c.chat_id ORDER BY m.sent_at DESC LIMIT 1) as last_message_text,
+                    -- Для direct чатов находим другого участника
+                    (CASE
+                        WHEN c.chat_type = 'direct' THEN (
+                            SELECT u.user_id 
+                            FROM chat_members cm_other
+                            JOIN users u ON cm_other.user_id = u.user_id
+                            WHERE cm_other.chat_id = c.chat_id AND cm_other.user_id != %s
+                            LIMIT 1
+                        )
+                        ELSE NULL
+                    END) as other_user_id,
+                    (CASE
+                        WHEN c.chat_type = 'direct' THEN (
+                            SELECT u.username 
+                            FROM chat_members cm_other
+                            JOIN users u ON cm_other.user_id = u.user_id
+                            WHERE cm_other.chat_id = c.chat_id AND cm_other.user_id != %s
+                            LIMIT 1
+                        )
+                        ELSE NULL
+                    END) as other_username
+                FROM chats c
+                JOIN chat_members cm_user ON c.chat_id = cm_user.chat_id
+                WHERE cm_user.user_id = %s
+                ORDER BY c.last_message_at DESC NULLS LAST, c.created_at DESC; 
+            """, (user_id, user_id, user_id)) # user_id передается три раза для подзапросов
+
+            raw_chats = cur.fetchall()
+            for row in raw_chats:
+                chat_name = row[2]
+                if row[1] == 'direct' and row[7]: # Если direct чат и есть other_username
+                    chat_name = row[7] # Используем имя собеседника как имя чата
+
+                chats_info.append({
+                    "chat_id": row[0],
+                    "chat_type": row[1],
+                    "chat_name": chat_name,
+                    "last_message_at": row[3].isoformat() if row[3] else None,
+                    "last_message_text": row[4] if row[4] else "Нет сообщений",
+                    "other_user_id": row[5] if row[1] == 'direct' else None,
+                    "other_username": row[7] if row[1] == 'direct' else None, # row[7] это other_username
+                    "unread_count": 0 # Заглушка, логику непрочитанных добавим позже
+                })
+            logger.debug(f"Для user_id {user_id} найдено {len(chats_info)} чатов.")
+    except psycopg2.Error as e:
+        logger.error(f"Ошибка при получении списка чатов для user_id {user_id}: {e}", exc_info=True)
+    return chats_info
+
+def save_message_to_db(conn, chat_id, sender_id, content_type, content, logger):
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                "INSERT INTO messages (chat_id, sender_id, content_type, content) VALUES (%s, %s, %s, %s) RETURNING message_id, sent_at", # sent_at уже есть
+                (chat_id, sender_id, content_type, content)
+            )
+            message_info = cur.fetchone() # message_info будет (message_id, sent_at_datetime_object)
+
+            if message_info:
+                sent_at_timestamp = message_info[1]
+                cur.execute(
+                    "UPDATE chats SET last_message_at = %s WHERE chat_id = %s",
+                    (sent_at_timestamp, chat_id)
+                )
+                conn.commit()
+                logger.info(f"Сообщение ID: {message_info[0]} от user_id: {sender_id} в chat_id: {chat_id} сохранено, last_message_at обновлено ({sent_at_timestamp.isoformat()}).")
+                return {"message_id": message_info[0], "timestamp": sent_at_timestamp.isoformat()} # Возвращаем словарь
+        return None
+    except psycopg2.Error as e:
+        conn.rollback()
+        logger.error(f"Ошибка при сохранении сообщения/обновлении чата (chat_id: {chat_id}, sender_id: {sender_id}): {e}", exc_info=True)
+        return None
+
+
+def get_chat_history_from_db(conn, chat_id, limit=50, logger=None):  # limit - сколько сообщений загружать
+    """Получает последние 'limit' сообщений для указанного chat_id."""
+    # Эта функция уже была почти готова, убедимся, что она соответствует
+    messages = []
+    try:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT m.message_id, u.username AS sender_username, m.sender_id, m.content, m.sent_at
+                FROM messages m
+                JOIN users u ON m.sender_id = u.user_id
+                WHERE m.chat_id = %s AND m.is_deleted = FALSE
+                ORDER BY m.sent_at ASC 
+                LIMIT %s; 
+            """, (chat_id, limit))
+
+            raw_messages = cur.fetchall()
+            for row in raw_messages:
+                messages.append({
+                    "message_id": row[0],
+                    "sender_username": row[1],
+                    "sender_id": row[2],  # Добавили sender_id
+                    "text": row[3],
+                    "timestamp": row[4].isoformat()
+                })
+            if logger:
+                logger.debug(f"Извлечено {len(messages)} сообщений для chat_id: {chat_id}")
+    except psycopg2.Error as e:
+        if logger:
+            logger.error(f"Ошибка при получении истории чата {chat_id} из БД: {e}", exc_info=True)
+    return messages
+

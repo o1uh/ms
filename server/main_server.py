@@ -44,7 +44,6 @@ def send_json_message(conn, message_data):
 
 # --- Основной обработчик клиента ---
 def handle_client(conn, addr):
-    """Обрабатывает соединение с клиентом в отдельном потоке."""
     server_logger.info(f"Новое подключение от {addr}")
     current_username = None
     current_user_id = None
@@ -53,13 +52,16 @@ def handle_client(conn, addr):
     db_conn = db_handler.get_db_connection(server_logger)
     if not db_conn:
         server_logger.error(f"Не удалось получить соединение с БД для клиента {addr}. Закрытие соединения.")
-        conn.close()
+        if conn:
+            try:
+                conn.close()
+            except Exception as e_conn_close:
+                server_logger.error(f"Ошибка при закрытии conn после неудачного подключения к БД: {e_conn_close}")
         return
 
     try:
-        # 1. Аутентификация (регистрация или логин)
         authenticated = False
-        auth_attempts = 0  # Ограничим количество попыток аутентификации
+        auth_attempts = 0
         MAX_AUTH_ATTEMPTS = 5
 
         while server_running and not authenticated and auth_attempts < MAX_AUTH_ATTEMPTS:
@@ -82,12 +84,6 @@ def handle_client(conn, addr):
                         payload = message_data.get("payload", {})
 
                         if msg_type == "register":
-                            # Вызываем функцию из auth_handler, передавая ей все необходимое
-                            # Пока что process_registration_request не создан в auth_handler,
-                            # поэтому оставим логику здесь и перенесем позже, или сделаем auth_handler более высокоуровневым.
-                            # Для текущего рефакторинга, оставим логику auth здесь, а auth_handler будет для утилит паролей.
-                            # Это упростит первый этап рефакторинга.
-
                             username = payload.get("username")
                             password = payload.get("password")
 
@@ -95,7 +91,7 @@ def handle_client(conn, addr):
                                 send_json_message(conn, {"type": "register_status", "payload": {"status": "error",
                                                                                                 "message": "Имя пользователя и пароль не могут быть пустыми."}})
                                 continue
-                            if len(password) < 4:
+                            if len(password) < 4:  # Простая валидация
                                 send_json_message(conn, {"type": "register_status", "payload": {"status": "error",
                                                                                                 "message": "Пароль должен быть не менее 4 символов."}})
                                 continue
@@ -152,39 +148,43 @@ def handle_client(conn, addr):
                                 send_json_message(conn, {"type": "login_status", "payload": {"status": "error",
                                                                                              "message": "Неверное имя пользователя или пароль."}})
 
-                        else:  # Неизвестный тип сообщения до аутентификации
+                        else:
                             server_logger.warning(f"Получено сообщение типа '{msg_type}' от {addr} до аутентификации.")
                             send_json_message(conn, {"type": "error_notification",
                                                      "payload": {"message": "Ожидалась регистрация или вход."}})
 
-                        if authenticated: break  # Выход из цикла while '\n' in client_buffer
+                        if authenticated: break
 
                     except json.JSONDecodeError:
                         server_logger.error(f"Ошибка декодирования JSON от {addr}: {message_str}", exc_info=True)
                         send_json_message(conn, {"type": "error_notification",
                                                  "payload": {"message": "Ошибка формата JSON."}})
-                        # Можно добавить разрыв соединения при повторяющихся ошибках формата
                     except Exception as e:
                         server_logger.error(f"Ошибка при обработке сообщения аутентификации от {addr}: {e}",
                                             exc_info=True)
                         send_json_message(conn, {"type": "error_notification",
                                                  "payload": {"message": "Внутренняя ошибка сервера."}})
 
-                if authenticated or not data: break  # Выход из цикла while server_running...
+                if authenticated or not data: break
 
             except ConnectionResetError:
                 server_logger.warning(f"Соединение сброшено клиентом {addr} (аутентификация).")
-                break
+                break  # Выход из цикла while server_running and not authenticated...
             except Exception as e:
                 server_logger.error(f"Ошибка чтения от {addr} (аутентификация): {e}", exc_info=True)
-                break
+                break  # Выход из цикла
 
         if not authenticated:
             server_logger.info(
                 f"Клиент {addr} не прошел аутентификацию после {auth_attempts} попыток. Закрытие соединения.")
-            return  # Завершаем обработку
+            # db_conn и conn закроются в finally
+            return
 
-        # 2. Основной цикл обработки сообщений от аутентифицированного клиента
+            # Сразу после успешной аутентификации, отправляем клиенту список его чатов
+        message_handler.process_request_chat_list(
+            db_conn, current_user_id, active_clients, send_json_message, server_logger
+        )
+
         client_buffer = ""
         while server_running:
             try:
@@ -204,15 +204,22 @@ def handle_client(conn, addr):
                         msg_type = message_data.get("type")
                         payload = message_data.get("payload", {})
 
-                        if msg_type == "private_message":
-                            # Вызываем функцию из message_handler
-                            message_handler.process_private_message(
+                        if msg_type == "send_message_to_chat":
+                            message_handler.process_send_message_to_chat(
                                 db_conn, payload, current_username, current_user_id,
                                 active_clients, clients_lock, send_json_message, server_logger
                             )
-                        # Сюда можно добавить обработку других типов сообщений, вызывая другие функции из message_handler
-                        # elif msg_type == "request_chat_history":
-                        #    message_handler.process_request_chat_history(...)
+                        elif msg_type == "request_chat_history":
+                            message_handler.process_request_chat_history(
+                                db_conn, payload, current_user_id,
+                                active_clients,  # Передаем active_clients
+                                send_json_message,
+                                server_logger
+                            )
+                        elif msg_type == "request_chat_list":  # Повторный запрос списка чатов
+                            message_handler.process_request_chat_list(
+                                db_conn, current_user_id, active_clients, send_json_message, server_logger
+                            )
                         else:
                             server_logger.warning(
                                 f"Получено сообщение неизвестного типа '{msg_type}' от {current_username}.")
@@ -231,28 +238,36 @@ def handle_client(conn, addr):
 
             except ConnectionResetError:
                 server_logger.warning(f"Соединение сброшено клиентом {current_username} ({addr}).")
-                break
+                break  # Выход из основного цикла while server_running
             except Exception as e:
                 server_logger.error(f"Ошибка чтения от {current_username} ({addr}): {e}", exc_info=True)
-                break
+                break  # Выход из основного цикла
 
     except Exception as e:
         server_logger.critical(
-            f"Критическая ошибка в обработчике клиента {addr} (пользователь: {current_username}): {e}", exc_info=True)
+            f"Неперехваченная критическая ошибка в обработчике клиента {addr} (пользователь: {current_username}): {e}",
+            exc_info=True)
     finally:
         if current_username:
             with clients_lock:
-                if current_username in active_clients and active_clients[current_username][
-                    'conn'] == conn:  # Убедимся, что удаляем именно это соединение
+                # Проверяем, что удаляем именно это соединение, если вдруг пользователь переподключился быстро
+                if current_username in active_clients and active_clients[current_username]['conn'] == conn:
                     del active_clients[current_username]
             server_logger.info(f"Клиент {current_username} ({addr}) удален из активных.")
 
         if db_conn:
-            db_conn.close()
-            server_logger.debug(f"Соединение с БД для {addr} (пользователь: {current_username}) закрыто.")
+            try:
+                db_conn.close()
+                server_logger.debug(f"Соединение с БД для {addr} (пользователь: {current_username}) закрыто.")
+            except Exception as e_db_close:
+                server_logger.error(f"Ошибка при закрытии соединения с БД для {addr}: {e_db_close}")
 
-        conn.close()
-        server_logger.debug(f"Сокет для {addr} (пользователь: {current_username}) окончательно закрыт.")
+        if conn:
+            try:
+                conn.close()
+            except Exception as e_conn_close:
+                server_logger.error(f"Ошибка при закрытии сокета для {addr}: {e_conn_close}")
+        server_logger.debug(f"Ресурсы для {addr} (пользователь: {current_username}) освобождены.")
 
 
 # --- Функция запуска сервера (остается почти такой же) ---
