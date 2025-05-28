@@ -1,0 +1,29 @@
+2025-05-29 03:05:40,188 - ServerApp - INFO - Запуск серверного приложения...
+2025-05-29 03:05:40,189 - ServerApp - INFO - Сервер запущен и слушает на 127.0.0.1:65432
+2025-05-29 03:05:40,189 - ServerApp - INFO - Для остановки сервера нажмите Ctrl+C в этой консоли.
+2025-05-29 03:05:56,267 - ServerApp - INFO - Новое подключение от ('127.0.0.1', 49213)
+2025-05-29 03:05:56,286 - ServerApp - INFO - Успешное подключение к базе данных PostgreSQL.
+2025-05-29 03:06:07,474 - ServerApp - DEBUG - Получено от ('127.0.0.1', 49213) (аутентификация): {"type": "login", "payload": {"username": "1111", "password": "1111"}}
+2025-05-29 03:06:07,637 - ServerApp - INFO - Клиент ('127.0.0.1', 49213) аутентифицирован как 1111 (ID: 1)
+2025-05-29 03:06:07,637 - ServerApp - INFO - Пользователь ID 1 запросил список чатов.
+2025-05-29 03:06:07,665 - ServerApp - CRITICAL - Неперехваченная критическая ошибка в обработчике клиента ('127.0.0.1', 49213) (пользователь: 1111): tuple index out of range
+Traceback (most recent call last):
+  File "C:\Users\PC\Desktop\mx\labs\ос\ms\server\main_server.py", line 184, in handle_client
+    message_handler.process_request_chat_list(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        db_conn, current_user_id, active_clients, send_json_message, server_logger
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\PC\Desktop\mx\labs\ос\ms\server\message_handler.py", line 12, in process_request_chat_list
+    user_chats = db_handler.get_user_chats(db_conn, current_user_id, logger)
+  File "C:\Users\PC\Desktop\mx\labs\ос\ms\server\db_handler.py", line 168, in get_user_chats
+    if row[1] == 'direct' and row[7]: # Если direct чат и есть other_username
+                              ~~~^^^
+IndexError: tuple index out of range
+2025-05-29 03:06:07,671 - ServerApp - INFO - Клиент 1111 (('127.0.0.1', 49213)) удален из активных.
+2025-05-29 03:06:07,671 - ServerApp - DEBUG - Соединение с БД для ('127.0.0.1', 49213) (пользователь: 1111) закрыто.
+2025-05-29 03:06:07,671 - ServerApp - DEBUG - Ресурсы для ('127.0.0.1', 49213) (пользователь: 1111) освобождены.
+2025-05-29 03:06:51,640 - ServerApp - INFO - Получен сигнал KeyboardInterrupt (Ctrl+C)...
+2025-05-29 03:06:51,640 - ServerApp - INFO - Сервер останавливается...
+2025-05-29 03:06:51,640 - ServerApp - INFO - Сервер полностью остановлен.

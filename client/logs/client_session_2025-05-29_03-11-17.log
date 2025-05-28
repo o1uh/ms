@@ -1,0 +1,88 @@
+2025-05-29 03:11:17,743 - ClientApp - INFO - Запуск клиентского приложения...
+2025-05-29 03:11:17,758 - ClientApp - INFO - Инициализация главного окна клиента...
+2025-05-29 03:11:17,764 - ClientApp - INFO - UI клиента инициализирован.
+2025-05-29 03:11:17,841 - ClientApp - INFO - Главное окно клиента отображено.
+2025-05-29 03:11:28,840 - ClientApp - INFO - Попытка подключения к 127.0.0.1:65432
+2025-05-29 03:11:28,843 - ClientApp - INFO - Успешно подключено к серверу 127.0.0.1:65432
+2025-05-29 03:11:28,845 - ClientApp - INFO - UI: Панель аутентификации. Статус: Подключено к 127.0.0.1. Введите данные.
+2025-05-29 03:11:35,632 - ClientApp - INFO - Отправка запроса на вход для: 1111
+2025-05-29 03:11:35,633 - ClientApp - DEBUG - Отправлено на сервер: {"type": "login", "payload": {"username": "1111", "password": "1111"}}
+2025-05-29 03:11:35,798 - ClientApp - INFO - Получено полное сообщение от сервера: {"type": "login_status", "payload": {"status": "success", "message": "Успешный вход.", "username": "1111", "user_id": 1}}
+2025-05-29 03:11:35,798 - ClientApp - INFO - Логин успешен как 1111 (ID: 1).
+2025-05-29 03:11:35,798 - ClientApp - INFO - UI: Панель списка чатов для 1111.
+2025-05-29 03:11:35,799 - ClientApp - INFO - Пользователь 1111 запрашивает список чатов.
+2025-05-29 03:11:35,799 - ClientApp - DEBUG - Отправлено на сервер: {"type": "request_chat_list", "payload": {}}
+2025-05-29 03:11:35,801 - ClientApp - INFO - Получено полное сообщение от сервера: {"type": "chat_list_response", "payload": {"chats": [{"chat_id": 1, "chat_type": "direct", "chat_name": "2222", "last_message_at": "2025-05-29T01:52:09.014815+07:00", "last_message_text": "123", "other_user_id": 2, "other_username": "2222", "unread_count": 0}]}}
+2025-05-29 03:11:35,801 - ClientApp - INFO - Получен список из 1 чатов.
+2025-05-29 03:11:36,610 - ClientApp - INFO - Получено полное сообщение от сервера: {"type": "chat_list_response", "payload": {"chats": [{"chat_id": 1, "chat_type": "direct", "chat_name": "2222", "last_message_at": "2025-05-29T01:52:09.014815+07:00", "last_message_text": "123", "other_user_id": 2, "other_username": "2222", "unread_count": 0}]}}
+2025-05-29 03:11:36,610 - ClientApp - INFO - Получен список из 1 чатов.
+2025-05-29 03:11:41,656 - ClientApp - INFO - Пользователь 1111 запрашивает список чатов.
+2025-05-29 03:11:41,656 - ClientApp - DEBUG - Отправлено на сервер: {"type": "request_chat_list", "payload": {}}
+2025-05-29 03:11:41,657 - ClientApp - INFO - Получено полное сообщение от сервера: {"type": "chat_list_response", "payload": {"chats": [{"chat_id": 1, "chat_type": "direct", "chat_name": "2222", "last_message_at": "2025-05-29T01:52:09.014815+07:00", "last_message_text": "123", "other_user_id": 2, "other_username": "2222", "unread_count": 0}]}}
+2025-05-29 03:11:41,658 - ClientApp - INFO - Получен список из 1 чатов.
+2025-05-29 03:11:48,560 - ClientApp - INFO - Выбран чат из списка: ID 1, Отображаемое имя 2222
+2025-05-29 03:11:48,560 - ClientApp - INFO - UI: Открыт чат ID 1 (2222). Запрос истории.
+2025-05-29 03:11:48,560 - ClientApp - INFO - Запрос истории для чата ID: 1
+2025-05-29 03:11:48,560 - ClientApp - DEBUG - Отправлено на сервер: {"type": "request_chat_history", "payload": {"chat_id": 1}}
+2025-05-29 03:11:48,563 - ClientApp - INFO - Получено полное сообщение от сервера: {"type": "chat_history", "payload": {"chat_id": 1, "messages": [{"message_id": 1, "sender_username": "2222", "sender_id": 2, "text": "132", "timestamp": "2025-05-29T01:23:41.159331+07:00"}, {"message_id": 2, "sender_username": "1111", "sender_id": 1, "text": "13", "timestamp": "2025-05-29T01:30:40.887900+07:00"}, {"message_id": 3, "sender_username": "1111", "sender_id": 1, "text": "123", "timestamp": "2025-05-29T01:52:09.014815+07:00"}]}}
+2025-05-29 03:11:48,563 - ClientApp - INFO - Получена история для чата ID 1 (3 сообщений).
+2025-05-29 03:11:54,160 - ClientApp - INFO - UI: Панель списка чатов для 1111.
+2025-05-29 03:11:54,160 - ClientApp - INFO - Пользователь 1111 запрашивает список чатов.
+2025-05-29 03:11:54,160 - ClientApp - DEBUG - Отправлено на сервер: {"type": "request_chat_list", "payload": {}}
+2025-05-29 03:11:54,163 - ClientApp - INFO - Получено полное сообщение от сервера: {"type": "chat_list_response", "payload": {"chats": [{"chat_id": 1, "chat_type": "direct", "chat_name": "2222", "last_message_at": "2025-05-29T01:52:09.014815+07:00", "last_message_text": "123", "other_user_id": 2, "other_username": "2222", "unread_count": 0}]}}
+2025-05-29 03:11:54,163 - ClientApp - INFO - Получен список из 1 чатов.
+2025-05-29 03:12:34,648 - ClientApp - INFO - Выбран чат из списка: ID 1, Отображаемое имя 2222
+2025-05-29 03:12:34,648 - ClientApp - INFO - UI: Открыт чат ID 1 (2222). Запрос истории.
+2025-05-29 03:12:34,648 - ClientApp - INFO - Запрос истории для чата ID: 1
+2025-05-29 03:12:34,648 - ClientApp - DEBUG - Отправлено на сервер: {"type": "request_chat_history", "payload": {"chat_id": 1}}
+2025-05-29 03:12:34,650 - ClientApp - INFO - Получено полное сообщение от сервера: {"type": "chat_history", "payload": {"chat_id": 1, "messages": [{"message_id": 1, "sender_username": "2222", "sender_id": 2, "text": "132", "timestamp": "2025-05-29T01:23:41.159331+07:00"}, {"message_id": 2, "sender_username": "1111", "sender_id": 1, "text": "13", "timestamp": "2025-05-29T01:30:40.887900+07:00"}, {"message_id": 3, "sender_username": "1111", "sender_id": 1, "text": "123", "timestamp": "2025-05-29T01:52:09.014815+07:00"}]}}
+2025-05-29 03:12:34,650 - ClientApp - INFO - Получена история для чата ID 1 (3 сообщений).
+2025-05-29 03:13:27,444 - ClientApp - INFO - Получено полное сообщение от сервера: {"type": "incoming_chat_message", "payload": {"chat_id": 1, "message_id": 4, "sender_username": "2222", "sender_id": 2, "text": "АХАХАХХАХАХА", "timestamp": "2025-05-29T03:13:12.130367+07:00"}}
+2025-05-29 03:13:27,444 - ClientApp - INFO - Входящее сообщение в чат ID 1 от 2222: АХАХАХХАХАХА
+2025-05-29 03:16:04,739 - ClientApp - INFO - Получено полное сообщение от сервера: {"type": "incoming_chat_message", "payload": {"chat_id": 1, "message_id": 5, "sender_username": "2222", "sender_id": 2, "text": "а щас", "timestamp": "2025-05-29T03:13:27.444301+07:00"}}
+2025-05-29 03:16:04,739 - ClientApp - INFO - Входящее сообщение в чат ID 1 от 2222: а щас
+2025-05-29 03:16:13,419 - ClientApp - INFO - Отправка сообщения в чат ID 1 (для 2222): отправка не убирается тварь
+2025-05-29 03:16:13,419 - ClientApp - DEBUG - Отправлено на сервер: {"type": "send_message_to_chat", "payload": {"chat_id": 1, "text": "отправка не убирается тварь"}}
+2025-05-29 03:16:24,720 - ClientApp - INFO - UI: Панель списка чатов для 1111.
+2025-05-29 03:16:24,720 - ClientApp - INFO - Пользователь 1111 запрашивает список чатов.
+2025-05-29 03:16:24,720 - ClientApp - DEBUG - Отправлено на сервер: {"type": "request_chat_list", "payload": {}}
+2025-05-29 03:16:24,723 - ClientApp - INFO - Получено полное сообщение от сервера: {"type": "chat_list_response", "payload": {"chats": [{"chat_id": 1, "chat_type": "direct", "chat_name": "2222", "last_message_at": "2025-05-29T03:11:35.634702+07:00", "last_message_text": "а щас", "other_user_id": 2, "other_username": "2222", "unread_count": 0}]}}
+2025-05-29 03:16:24,723 - ClientApp - INFO - Получен список из 1 чатов.
+2025-05-29 03:16:26,591 - ClientApp - INFO - Выбран чат из списка: ID 1, Отображаемое имя 2222
+2025-05-29 03:16:26,592 - ClientApp - INFO - UI: Открыт чат ID 1 (2222). Запрос истории.
+2025-05-29 03:16:26,592 - ClientApp - INFO - Запрос истории для чата ID: 1
+2025-05-29 03:16:26,592 - ClientApp - DEBUG - Отправлено на сервер: {"type": "request_chat_history", "payload": {"chat_id": 1}}
+2025-05-29 03:16:26,594 - ClientApp - INFO - Получено полное сообщение от сервера: {"type": "chat_history", "payload": {"chat_id": 1, "messages": [{"message_id": 1, "sender_username": "2222", "sender_id": 2, "text": "132", "timestamp": "2025-05-29T01:23:41.159331+07:00"}, {"message_id": 2, "sender_username": "1111", "sender_id": 1, "text": "13", "timestamp": "2025-05-29T01:30:40.887900+07:00"}, {"message_id": 3, "sender_username": "1111", "sender_id": 1, "text": "123", "timestamp": "2025-05-29T01:52:09.014815+07:00"}, {"message_id": 6, "sender_username": "1111", "sender_id": 1, "text": "отправка не убирается тварь", "timestamp": "2025-05-29T03:11:35.634702+07:00"}, {"message_id": 4, "sender_username": "2222", "sender_id": 2, "text": "АХАХАХХАХАХА", "timestamp": "2025-05-29T03:13:12.130367+07:00"}, {"message_id": 5, "sender_username": "2222", "sender_id": 2, "text": "а щас", "timestamp": "2025-05-29T03:13:27.444301+07:00"}]}}
+2025-05-29 03:16:26,594 - ClientApp - INFO - Получена история для чата ID 1 (6 сообщений).
+2025-05-29 03:16:41,728 - ClientApp - INFO - Отправка сообщения в чат ID 1 (для 2222): нук
+2025-05-29 03:16:41,728 - ClientApp - DEBUG - Отправлено на сервер: {"type": "send_message_to_chat", "payload": {"chat_id": 1, "text": "нук"}}
+2025-05-29 03:16:51,403 - ClientApp - INFO - Получено полное сообщение от сервера: {"type": "incoming_chat_message", "payload": {"chat_id": 1, "message_id": 8, "sender_username": "2222", "sender_id": 2, "text": "странно", "timestamp": "2025-05-29T03:16:04.738908+07:00"}}
+2025-05-29 03:16:51,403 - ClientApp - INFO - Входящее сообщение в чат ID 1 от 2222: странно
+2025-05-29 03:18:49,088 - ClientApp - INFO - Отправка сообщения в чат ID 1 (для 2222): 111
+2025-05-29 03:18:49,088 - ClientApp - DEBUG - Отправлено на сервер: {"type": "send_message_to_chat", "payload": {"chat_id": 1, "text": "111"}}
+2025-05-29 03:18:58,680 - ClientApp - INFO - UI: Панель списка чатов для 1111.
+2025-05-29 03:18:58,680 - ClientApp - INFO - Пользователь 1111 запрашивает список чатов.
+2025-05-29 03:18:58,680 - ClientApp - DEBUG - Отправлено на сервер: {"type": "request_chat_list", "payload": {}}
+2025-05-29 03:18:58,683 - ClientApp - INFO - Получено полное сообщение от сервера: {"type": "chat_list_response", "payload": {"chats": [{"chat_id": 1, "chat_type": "direct", "chat_name": "2222", "last_message_at": "2025-05-29T03:16:41.730885+07:00", "last_message_text": "111", "other_user_id": 2, "other_username": "2222", "unread_count": 0}]}}
+2025-05-29 03:18:58,683 - ClientApp - INFO - Получен список из 1 чатов.
+2025-05-29 03:18:59,855 - ClientApp - INFO - Выбран чат из списка: ID 1, Отображаемое имя 2222
+2025-05-29 03:18:59,856 - ClientApp - INFO - UI: Открыт чат ID 1 (2222). Запрос истории.
+2025-05-29 03:18:59,856 - ClientApp - INFO - Запрос истории для чата ID: 1
+2025-05-29 03:18:59,856 - ClientApp - DEBUG - Отправлено на сервер: {"type": "request_chat_history", "payload": {"chat_id": 1}}
+2025-05-29 03:18:59,858 - ClientApp - INFO - Получено полное сообщение от сервера: {"type": "chat_history", "payload": {"chat_id": 1, "messages": [{"message_id": 1, "sender_username": "2222", "sender_id": 2, "text": "132", "timestamp": "2025-05-29T01:23:41.159331+07:00"}, {"message_id": 2, "sender_username": "1111", "sender_id": 1, "text": "13", "timestamp": "2025-05-29T01:30:40.887900+07:00"}, {"message_id": 3, "sender_username": "1111", "sender_id": 1, "text": "123", "timestamp": "2025-05-29T01:52:09.014815+07:00"}, {"message_id": 6, "sender_username": "1111", "sender_id": 1, "text": "отправка не убирается тварь", "timestamp": "2025-05-29T03:11:35.634702+07:00"}, {"message_id": 4, "sender_username": "2222", "sender_id": 2, "text": "АХАХАХХАХАХА", "timestamp": "2025-05-29T03:13:12.130367+07:00"}, {"message_id": 5, "sender_username": "2222", "sender_id": 2, "text": "а щас", "timestamp": "2025-05-29T03:13:27.444301+07:00"}, {"message_id": 8, "sender_username": "2222", "sender_id": 2, "text": "странно", "timestamp": "2025-05-29T03:16:04.738908+07:00"}, {"message_id": 7, "sender_username": "1111", "sender_id": 1, "text": "нук", "timestamp": "2025-05-29T03:16:13.422549+07:00"}, {"message_id": 9, "sender_username": "1111", "sender_id": 1, "text": "111", "timestamp": "2025-05-29T03:16:41.730885+07:00"}]}}
+2025-05-29 03:18:59,858 - ClientApp - INFO - Получена история для чата ID 1 (9 сообщений).
+2025-05-29 03:21:56,280 - ClientApp - INFO - UI: Панель списка чатов для 1111.
+2025-05-29 03:21:56,280 - ClientApp - INFO - Пользователь 1111 запрашивает список чатов.
+2025-05-29 03:21:56,280 - ClientApp - DEBUG - Отправлено на сервер: {"type": "request_chat_list", "payload": {}}
+2025-05-29 03:21:56,281 - ClientApp - INFO - Получено полное сообщение от сервера: {"type": "chat_list_response", "payload": {"chats": [{"chat_id": 1, "chat_type": "direct", "chat_name": "2222", "last_message_at": "2025-05-29T03:16:41.730885+07:00", "last_message_text": "111", "other_user_id": 2, "other_username": "2222", "unread_count": 0}]}}
+2025-05-29 03:21:56,281 - ClientApp - INFO - Получен список из 1 чатов.
+2025-05-29 03:21:57,504 - ClientApp - INFO - Выбран чат из списка: ID 1, Отображаемое имя 2222
+2025-05-29 03:21:57,504 - ClientApp - INFO - UI: Открыт чат ID 1 (2222). Запрос истории.
+2025-05-29 03:21:57,504 - ClientApp - INFO - Запрос истории для чата ID: 1
+2025-05-29 03:21:57,504 - ClientApp - DEBUG - Отправлено на сервер: {"type": "request_chat_history", "payload": {"chat_id": 1}}
+2025-05-29 03:21:57,506 - ClientApp - INFO - Получено полное сообщение от сервера: {"type": "chat_history", "payload": {"chat_id": 1, "messages": [{"message_id": 1, "sender_username": "2222", "sender_id": 2, "text": "132", "timestamp": "2025-05-29T01:23:41.159331+07:00"}, {"message_id": 2, "sender_username": "1111", "sender_id": 1, "text": "13", "timestamp": "2025-05-29T01:30:40.887900+07:00"}, {"message_id": 3, "sender_username": "1111", "sender_id": 1, "text": "123", "timestamp": "2025-05-29T01:52:09.014815+07:00"}, {"message_id": 6, "sender_username": "1111", "sender_id": 1, "text": "отправка не убирается тварь", "timestamp": "2025-05-29T03:11:35.634702+07:00"}, {"message_id": 4, "sender_username": "2222", "sender_id": 2, "text": "АХАХАХХАХАХА", "timestamp": "2025-05-29T03:13:12.130367+07:00"}, {"message_id": 5, "sender_username": "2222", "sender_id": 2, "text": "а щас", "timestamp": "2025-05-29T03:13:27.444301+07:00"}, {"message_id": 8, "sender_username": "2222", "sender_id": 2, "text": "странно", "timestamp": "2025-05-29T03:16:04.738908+07:00"}, {"message_id": 7, "sender_username": "1111", "sender_id": 1, "text": "нук", "timestamp": "2025-05-29T03:16:13.422549+07:00"}, {"message_id": 9, "sender_username": "1111", "sender_id": 1, "text": "111", "timestamp": "2025-05-29T03:16:41.730885+07:00"}]}}
+2025-05-29 03:21:57,506 - ClientApp - INFO - Получена история для чата ID 1 (9 сообщений).
+2025-05-29 03:22:01,489 - ClientApp - INFO - Окно клиента закрывается. Отключение от сервера.
+2025-05-29 03:22:01,489 - ClientApp - INFO - Отключено от сервера.
+2025-05-29 03:22:01,490 - ClientApp - INFO - UI: Панель подключения. Статус: Соединение с сервером разорвано.
+2025-05-29 03:22:01,494 - ClientApp - INFO - Клиентское приложение завершено с кодом: 0

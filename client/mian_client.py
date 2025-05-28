@@ -384,7 +384,7 @@ class ChatClientWindow(QWidget):  # Или QMainWindow, если предпоч�
         client_logger.info(f"Отправка сообщения в чат ID {self.active_chat_id} (для {self.active_chat_name}): {text}")
         if self.send_json_message({"type": "send_message_to_chat", "payload": payload_data}):
             # Отображаем свое сообщение сразу, если отправка была инициирована
-            self.chat_display.append(f"<b>Вы</b>: {text} <i>(отправка...)</i>")  # Можно добавить индикатор отправки
+            self.chat_display.append(f"<b>Вы</b>: {text}")  # Можно добавить индикатор отправки
             self.message_input.clear()
             self.message_input.setFocus()
         # Если send_json_message вернул False, там уже было QMessageBox

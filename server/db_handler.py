@@ -164,19 +164,23 @@ def get_user_chats(conn, user_id, logger):
 
             raw_chats = cur.fetchall()
             for row in raw_chats:
-                chat_name = row[2]
-                if row[1] == 'direct' and row[7]: # Если direct чат и есть other_username
-                    chat_name = row[7] # Используем имя собеседника как имя чата
+                chat_name_from_db = row[2]  # Исходное имя чата из БД (может быть NULL для direct)
+                chat_type = row[1]
+                other_username_val = row[6]  # <--- ИСПРАВЛЕНИЕ ЗДЕСЬ (было row[7])
+
+                chat_name_to_display = chat_name_from_db  # По умолчанию
+                if chat_type == 'direct' and other_username_val:
+                    chat_name_to_display = other_username_val  # Для direct чата используем имя собеседника
 
                 chats_info.append({
                     "chat_id": row[0],
-                    "chat_type": row[1],
-                    "chat_name": chat_name,
+                    "chat_type": chat_type,
+                    "chat_name": chat_name_to_display,  # Имя для отображения
                     "last_message_at": row[3].isoformat() if row[3] else None,
                     "last_message_text": row[4] if row[4] else "Нет сообщений",
-                    "other_user_id": row[5] if row[1] == 'direct' else None,
-                    "other_username": row[7] if row[1] == 'direct' else None, # row[7] это other_username
-                    "unread_count": 0 # Заглушка, логику непрочитанных добавим позже
+                    "other_user_id": row[5] if chat_type == 'direct' else None,
+                    "other_username": other_username_val if chat_type == 'direct' else None,
+                    "unread_count": 0
                 })
             logger.debug(f"Для user_id {user_id} найдено {len(chats_info)} чатов.")
     except psycopg2.Error as e:
@@ -219,7 +223,7 @@ def get_chat_history_from_db(conn, chat_id, limit=50, logger=None):  # limit - �
                 FROM messages m
                 JOIN users u ON m.sender_id = u.user_id
                 WHERE m.chat_id = %s AND m.is_deleted = FALSE
-                ORDER BY m.sent_at ASC 
+                ORDER BY m.sent_at ASC, m.message_id ASC 
                 LIMIT %s; 
             """, (chat_id, limit))
 
