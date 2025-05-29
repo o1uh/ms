@@ -1,0 +1,3 @@
+2025-05-30 01:41:28,807 - MainWindow - INFO - Инициализация ChatClientWindow...
+2025-05-30 01:41:28,814 - MainWindow - INFO - UI и SocketHandler для ChatClientWindow инициализированы.
+2025-05-30 01:41:36,250 - MainWindow - INFO - Окно клиента закрывается. Отключение от сервера через SocketHandler.
