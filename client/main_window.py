@@ -49,6 +49,8 @@ class ChatClientWindow(QWidget):  # Или QMainWindow
         self.socket_handler.unknown_message_received.connect(self.handle_unknown_message)
         #self.socket_handler.create_group_response_received = Signal(dict)
         self.socket_handler.create_group_response_received.connect(self.handle_create_group_response)
+        self.socket_handler.initiate_direct_chat_response_received.connect(
+        self.handle_initiate_direct_chat_response)  # НОВОЕ ПОДКЛЮЧЕНИЕ
 
         self.current_username = None
         self.current_user_id = None
@@ -232,74 +234,45 @@ class ChatClientWindow(QWidget):  # Или QMainWindow
         message_data = {"type": "request_chat_history", "payload": {"chat_id": chat_id}}
         self.socket_handler.send_json_message(message_data)
 
-    @Slot(str)  # Слот для сигнала от ChatPanel
-    def attempt_send_message_to_active_chat(self, text: str):  # Принимаем текст от панели
-        if not self.current_user_id:
-            QMessageBox.warning(self, "Ошибка", "Вы не вошли на сервер.")
-            return
+    @Slot(str)
+    def attempt_send_message_to_active_chat(self, text: str):
+        if not self.current_user_id:  # ...
+            if not text: return
 
-        if not text:  # Проверка на пустое сообщение уже в панели, но можно и здесь
-            main_window_logger.warning("Попытка отправки пустого сообщения.")
+        if self.active_chat_id is None:  # Этого теперь не должно происходить, если чат открывается только после initiate_direct_chat
+            QMessageBox.warning(self, "Ошибка", "Чат не выбран или ID чата не определен.")
+            main_window_logger.error("Попытка отправки сообщения, когда active_chat_id is None (ошибка логики).")
             return
-
-        # Ключевой момент: если active_chat_id is None (новый чат)
-        if self.active_chat_id is None:
-            if self.active_chat_name:  # Если есть имя собеседника для нового чата
-                main_window_logger.info(f"Отправка первого сообщения в новый чат с {self.active_chat_name}: {text}")
-                # Отправляем специальное сообщение для создания чата ИЛИ сервер должен это обработать
-                # Пока что наш сервер ожидает chat_id в "send_message_to_chat".
-                # Это место нужно будет согласовать с серверной логикой "get_or_create_direct_chat"
-                # или добавить новый тип запроса "create_direct_chat_and_send_message".
-                # ВРЕМЕННОЕ РЕШЕНИЕ: Отправляем как есть, сервер должен создать чат по участникам, если chat_id не указан,
-                # но это потребует доработки сервера.
-                # ЛИБО: кнопка "Начать чат" должна сначала создать чат и получить ID.
-                # Для текущей реализации сервера, которая строго требует chat_id:
-                QMessageBox.warning(self, "Новый чат",
-                                    "Сначала чат должен быть создан на сервере (например, сервер должен вернуть ID чата после его инициации). Отправка в новый чат без ID пока не поддерживается.")
-                main_window_logger.error(
-                    f"Попытка отправки сообщения в новый чат '{self.active_chat_name}' без chat_id.")
-                return
-            else:  # Не должно произойти, если UI корректно управляет состояниями
-                QMessageBox.warning(self, "Ошибка", "Не выбран активный чат для отправки.")
-                return
 
         payload_data = {"chat_id": self.active_chat_id, "text": text}
         main_window_logger.info(
-            f"Отправка сообщения в чат ID {self.active_chat_id} (для {self.active_chat_name}): {text} через SocketHandler.")
-
+            f"Отправка сообщения в чат ID {self.active_chat_id} (для {self.active_chat_name}): {text}")
         if self.socket_handler.send_json_message({"type": "send_message_to_chat", "payload": payload_data}):
-            # Оптимистичное отображение (или дождаться подтверждения от сервера)
-            # Теперь это делает сама ChatPanel
-            pass
-            # Обновление UI после отправки (например, очистка поля ввода) должно быть в ChatPanel
+            # Оптимистичное отображение в ChatPanel
+            # self.chat_panel_widget.add_message_to_display(self.current_username, text, datetime.now().isoformat(), True)
+            # Очистка поля ввода сообщения в ChatPanel
+            self.chat_panel_widget.message_input.clear()
+            self.chat_panel_widget.message_input.setFocus()
 
     # --- Обработчики действий UI, связанных с чатами (вызываются из ChatListPanel) ---
     @Slot(str)
-    def on_request_new_direct_chat_from_panel(self, target_username: str):  # Измененный слот
-        # ... (логика такая же, как была в on_start_or_open_chat_with_user,
-        #      но теперь она только для личных чатов) ...
+    def on_request_new_direct_chat_from_panel(self, target_username: str):
         if not self.current_user_id: return
-        if not target_username: QMessageBox.warning(self, "Новый чат", "Введите имя пользователя."); return
-        if target_username == self.current_username: QMessageBox.warning(self, "Новый чат",
-                                                                         "Нельзя начать чат с самим собой."); return
-        main_window_logger.info(f"Запрос на новый/существующий личный чат с {target_username} от панели.")
-        # Поиск в существующем списке
-        for i in range(self.chat_list_panel_widget.chat_list_widget.count()):
-            item = self.chat_list_panel_widget.chat_list_widget.item(i)
-            chat_data = item.data(Qt.UserRole)
-            if chat_data and chat_data.get("chat_type") == "direct" and chat_data.get(
-                    "other_username") == target_username:
-                self.open_chat_from_data(chat_data);
-                return
-        # Если не найден, открываем как новый (сервер создаст при первом сообщении или по спец. запросу)
-        main_window_logger.info(f"Новый личный диалог с {target_username}. Открытие панели чата (ID пока не известен).")
-        self.show_specific_chat_panel_ui_action(None, target_username)
+        if not target_username:  # Эта проверка уже есть в панели, но дублируем
+            QMessageBox.warning(self, "Новый чат", "Введите имя пользователя.");
+            return
+        if target_username == self.current_username:
+            QMessageBox.warning(self, "Новый чат", "Нельзя начать чат с самим собой.");
+            return
 
-        # 2. Если чата нет в списке - это новый диалог.
-        #    Мы не знаем chat_id. Сервер его создаст при первой отправке сообщения.
-        #    Пока что просто откроем панель чата.
-        main_window_logger.info(f"Новый диалог с {target_username}. Открытие панели чата (ID пока не известен).")
-        self.open_chat_panel_ui_action(None, target_username)  # chat_id is None, chat_name is target_username
+        main_window_logger.info(f"Инициация чата с {target_username} через SocketHandler.")
+        self.status_label.setText(f"Открытие чата с {target_username}...")
+        # Блокируем кнопку на время запроса (опционально)
+        # self.chat_list_panel_widget.start_direct_chat_button.setEnabled(False)
+
+        message_data = {"type": "initiate_direct_chat", "payload": {"target_username": target_username}}
+        self.socket_handler.send_json_message(message_data)
+        # Очищать поле ввода new_direct_chat_user_input лучше после успешного ответа
 
     @Slot(dict)  # Слот для сигнала chat_selected от ChatListPanel
     def on_chat_selected_from_panel(self, chat_data: dict):
@@ -499,3 +472,34 @@ class ChatClientWindow(QWidget):  # Или QMainWindow
         # Убедимся, что статусбар обновлен, если мы на панели списка чатов
         if self.stacked_widget.currentWidget() == self.chat_list_panel_widget:
             self.status_label.setText(f"Статус: Список чатов ({self.current_username})")
+
+    @Slot(dict)  # НОВЫЙ МЕТОД
+    def handle_initiate_direct_chat_response(self, payload: dict):
+        main_window_logger.info(f"СИГНАЛ: Получен ответ на инициацию чата: {payload}")
+        status = payload.get("status")
+
+        # Разблокируем кнопку на ChatListPanel, если блокировали
+        # if hasattr(self, 'chat_list_panel_widget'):
+        #    self.chat_list_panel_widget.start_direct_chat_button.setEnabled(True)
+
+        if status == "success":
+            chat_id = payload.get("chat_id")
+            chat_name = payload.get("chat_name")  # Это имя собеседника
+            # other_user_id = payload.get("other_user_id")
+            # other_username = payload.get("other_username")
+
+            if chat_id and chat_name:
+                main_window_logger.info(
+                    f"Чат с {chat_name} успешно инициирован/найден. ID: {chat_id}. Открываем панель чата.")
+                if hasattr(self, 'chat_list_panel_widget'):
+                    self.chat_list_panel_widget.new_direct_chat_user_input.clear()  # Очищаем поле ввода
+                self.show_specific_chat_panel_ui_action(chat_id, chat_name)
+                # Список чатов обновится при следующем заходе на ChatListPanel или при новом сообщении
+            else:
+                QMessageBox.critical(self, "Ошибка чата",
+                                     "Сервер вернул успешный статус, но не предоставил данные чата.")
+                self.show_chat_list_panel_ui_action()  # Возвращаемся к списку
+        else:
+            msg = payload.get("message", "Не удалось начать чат.")
+            QMessageBox.warning(self, "Ошибка чата", msg)
+            self.show_chat_list_panel_ui_action()  # Возвращаемся к списку

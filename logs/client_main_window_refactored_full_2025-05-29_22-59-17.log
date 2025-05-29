@@ -1,0 +1,4 @@
+2025-05-29 22:59:17,027 - MainWindow - INFO - Инициализация ChatClientWindow...
+2025-05-29 22:59:17,035 - MainWindow - INFO - UI и SocketHandler для ChatClientWindow инициализированы.
+2025-05-29 22:59:18,601 - MainWindow - INFO - Получен запрос на подключение к 127.0.0.1:65432 от ConnectPanel.
+2025-05-29 22:59:21,259 - MainWindow - INFO - Окно клиента закрывается. Отключение от сервера через SocketHandler.

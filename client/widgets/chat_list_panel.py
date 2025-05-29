@@ -76,6 +76,13 @@ class ChatListPanel(QWidget):
         else:
             QMessageBox.warning(self, "Личный чат", "Введите имя пользователя.")
 
+    @Slot()
+    def _on_start_direct_chat_clicked(self):  # Этот метод теперь просто испускает сигнал
+        target_username = self.new_direct_chat_user_input.text().strip()
+        if target_username:  # Базовая проверка, остальную валидацию сделает main_window
+            self.request_new_direct_chat.emit(target_username)
+        else:
+            QMessageBox.warning(self, "Новый чат", "Введите имя пользователя.")
 
     @Slot()
     def _on_create_group_clicked(self):

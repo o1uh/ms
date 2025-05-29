@@ -226,3 +226,60 @@ def process_create_group_request(db_conn, payload, current_username, current_use
     else:
         send_json_message_func(current_user_conn, {"type": "create_group_response", "payload": {"status": "error",
                                                                                                 "message": "Не удалось создать группу."}})
+
+
+def process_initiate_direct_chat(db_conn, payload, current_username, current_user_id, active_clients,
+                                 send_json_message_func, logger):
+    target_username = payload.get("target_username")
+
+    # Получаем соединение текущего пользователя (кто инициирует)
+    sender_conn = None
+    if current_username in active_clients:
+        sender_conn = active_clients[current_username]['conn']
+    else:
+        logger.error(f"Не найден отправитель {current_username} в active_clients при инициации чата.")
+        return  # Не можем отправить ответ
+
+    if not target_username:
+        send_json_message_func(sender_conn, {"type": "initiate_direct_chat_response", "payload": {"status": "error",
+                                                                                                  "message": "Не указано имя пользователя для чата."}})
+        return
+
+    if target_username == current_username:
+        send_json_message_func(sender_conn, {"type": "initiate_direct_chat_response", "payload": {"status": "error",
+                                                                                                  "message": "Нельзя начать чат с самим собой."}})
+        return
+
+    # 1. Найти целевого пользователя
+    target_user_data = db_handler.get_user_from_db(db_conn, target_username, logger)
+    if not target_user_data:
+        send_json_message_func(sender_conn, {"type": "initiate_direct_chat_response", "payload": {"status": "error",
+                                                                                                  "message": f"Пользователь '{target_username}' не найден."}})
+        return
+
+    target_user_id = target_user_data["user_id"]
+
+    # 2. Получить/создать чат и его ID
+    chat_id = db_handler.get_or_create_direct_chat(db_conn, current_user_id, target_user_id, logger)
+
+    if chat_id:
+        logger.info(
+            f"Чат между {current_username} (ID:{current_user_id}) и {target_username} (ID:{target_user_id}) инициирован/найден. Chat ID: {chat_id}")
+        response_payload = {
+            "status": "success",
+            "chat_id": chat_id,
+            "chat_name": target_username,  # Имя чата для клиента - это имя собеседника
+            "other_user_id": target_user_id,
+            "other_username": target_username
+        }
+        send_json_message_func(sender_conn, {"type": "initiate_direct_chat_response", "payload": response_payload})
+
+        # После успешной инициации чата (особенно если он новый),
+        # хорошо бы обновить список чатов у инициатора
+        # Это можно сделать, отправив ему обновленный chat_list_response,
+        # или клиент сам запросит обновление после перехода в панель чатов.
+        # Пока оставим так, клиент запросит историю сам.
+    else:
+        logger.error(f"Не удалось получить/создать chat_id для диалога между {current_username} и {target_username}.")
+        send_json_message_func(sender_conn, {"type": "initiate_direct_chat_response", "payload": {"status": "error",
+                                                                                                  "message": "Ошибка сервера при создании/поиске чата."}})

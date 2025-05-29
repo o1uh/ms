@@ -33,6 +33,7 @@ class SocketHandler(QObject):  # Наследуемся от QObject для ис
     incoming_message_received = Signal(dict)  # payload от incoming_chat_message
     error_notification_received = Signal(dict)  # payload от error_notification
     unknown_message_received = Signal(str, dict)  # тип сообщения, payload
+    initiate_direct_chat_response_received = Signal(dict)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -129,6 +130,8 @@ class SocketHandler(QObject):  # Наследуемся от QObject для ис
                     self.chat_history_received.emit(payload)
                 elif msg_type == "incoming_chat_message":
                     self.incoming_message_received.emit(payload)
+                elif msg_type == "initiate_direct_chat_response":  # НОВЫЙ ОБРАБОТЧИК
+                    self.initiate_direct_chat_response_received.emit(payload)
                 elif msg_type == "create_group_response":
                     self.create_group_response_received.emit(payload)
                 elif msg_type == "error_notification":
