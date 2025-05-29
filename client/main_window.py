@@ -30,8 +30,8 @@ class ChatClientWindow(QWidget):  # Или QMainWindow
     def __init__(self):
         super().__init__()
         main_window_logger.info("Инициализация ChatClientWindow...")
-        self.setWindowTitle("Мессенджер Клиент v0.5 - Полный Рефакторинг")
-        self.setGeometry(200, 200, 500, 600)  # Немного изменил размер для панелей
+        self.setWindowTitle("ЦЕМЕНТ")
+        self.setGeometry(200, 200, 500, 600)
 
         self.socket_handler = SocketHandler(self)
 
