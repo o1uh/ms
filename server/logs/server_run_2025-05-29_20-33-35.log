@@ -1,0 +1,47 @@
+2025-05-29 20:33:35,264 - ServerApp - INFO - Запуск серверного приложения...
+2025-05-29 20:33:35,264 - ServerApp - INFO - Сервер запущен и слушает на 127.0.0.1:65432
+2025-05-29 20:33:35,264 - ServerApp - INFO - Для остановки сервера нажмите Ctrl+C в этой консоли.
+2025-05-29 20:33:47,362 - ServerApp - INFO - Новое подключение от ('127.0.0.1', 52331)
+2025-05-29 20:33:47,490 - ServerApp - INFO - Успешное подключение к базе данных PostgreSQL.
+2025-05-29 20:33:47,866 - ServerApp - INFO - Новое подключение от ('127.0.0.1', 52333)
+2025-05-29 20:33:47,882 - ServerApp - INFO - Успешное подключение к базе данных PostgreSQL.
+2025-05-29 20:33:51,826 - ServerApp - DEBUG - Получено от ('127.0.0.1', 52331) (аутентификация): {"type": "login", "payload": {"username": "1111", "password": "1111"}}
+2025-05-29 20:33:51,985 - ServerApp - INFO - Клиент ('127.0.0.1', 52331) аутентифицирован как 1111 (ID: 1)
+2025-05-29 20:33:51,985 - ServerApp - INFO - Пользователь ID 1 запросил список чатов.
+2025-05-29 20:33:51,989 - ServerApp - DEBUG - Для user_id 1 найдено 6 чатов.
+2025-05-29 20:33:51,989 - ServerApp - DEBUG - Получено от 1111 (('127.0.0.1', 52331)): {"type": "request_chat_list", "payload": {}}
+2025-05-29 20:33:51,989 - ServerApp - INFO - Пользователь ID 1 запросил список чатов.
+2025-05-29 20:33:51,990 - ServerApp - DEBUG - Для user_id 1 найдено 6 чатов.
+2025-05-29 20:33:55,666 - ServerApp - DEBUG - Получено от ('127.0.0.1', 52333) (аутентификация): {"type": "login", "payload": {"username": "3333", "password": "3333"}}
+2025-05-29 20:33:55,824 - ServerApp - INFO - Клиент ('127.0.0.1', 52333) аутентифицирован как 3333 (ID: 3)
+2025-05-29 20:33:55,824 - ServerApp - INFO - Пользователь ID 3 запросил список чатов.
+2025-05-29 20:33:55,828 - ServerApp - DEBUG - Для user_id 3 найдено 3 чатов.
+2025-05-29 20:33:55,828 - ServerApp - DEBUG - Получено от 3333 (('127.0.0.1', 52333)): {"type": "request_chat_list", "payload": {}}
+2025-05-29 20:33:55,828 - ServerApp - INFO - Пользователь ID 3 запросил список чатов.
+2025-05-29 20:33:55,828 - ServerApp - DEBUG - Для user_id 3 найдено 3 чатов.
+2025-05-29 20:34:05,067 - ServerApp - DEBUG - Получено от 1111 (('127.0.0.1', 52331)): {"type": "request_chat_history", "payload": {"chat_id": 6}}
+2025-05-29 20:34:05,067 - ServerApp - INFO - User_id 1 запросил историю для чата ID 6.
+2025-05-29 20:34:05,067 - ServerApp - DEBUG - Извлечено 0 сообщений для chat_id: 6
+2025-05-29 20:34:06,115 - ServerApp - DEBUG - Получено от 3333 (('127.0.0.1', 52333)): {"type": "request_chat_history", "payload": {"chat_id": 6}}
+2025-05-29 20:34:06,115 - ServerApp - INFO - User_id 3 запросил историю для чата ID 6.
+2025-05-29 20:34:06,115 - ServerApp - DEBUG - Извлечено 0 сообщений для chat_id: 6
+2025-05-29 20:34:09,399 - ServerApp - DEBUG - Получено от 3333 (('127.0.0.1', 52333)): {"type": "send_message_to_chat", "payload": {"chat_id": 6, "text": "1"}}
+2025-05-29 20:34:09,405 - ServerApp - ERROR - Ошибка при сохранении сообщения/обновлении чата (chat_id: 6, sender_id: 3): null value in column "sent_at" of relation "messages" violates not-null constraint
+DETAIL:  Failing row contains (72, 6, 3, text, 1, null, null, f).
+Traceback (most recent call last):
+  File "C:\Users\PC\Desktop\mx\labs\ос\ms\server\db_handler.py", line 206, in save_message_to_db
+    cur.execute(
+    ~~~~~~~~~~~^
+        "INSERT INTO messages (chat_id, sender_id, content_type, content) VALUES (%s, %s, %s, %s) RETURNING message_id, sent_at", # sent_at уже есть
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        (chat_id, sender_id, content_type, content)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+psycopg2.errors.NotNullViolation: null value in column "sent_at" of relation "messages" violates not-null constraint
+DETAIL:  Failing row contains (72, 6, 3, text, 1, null, null, f).
+
+2025-05-29 20:34:09,410 - ServerApp - ERROR - Сообщение от 3333 в чат 6 не было сохранено в БД.
+2025-05-29 20:36:44,186 - ServerApp - INFO - Получен сигнал KeyboardInterrupt (Ctrl+C)...
+2025-05-29 20:36:44,186 - ServerApp - INFO - Сервер останавливается...
+2025-05-29 20:36:44,186 - ServerApp - INFO - Сервер полностью остановлен.

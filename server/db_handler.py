@@ -1,5 +1,6 @@
 # server/db_handler.py
 import psycopg2
+from datetime import datetime, timezone
 import os # Для доступа к переменным окружения, если захотите
 # Можно импортировать логгер, если он нужен внутри этих функций напрямую
 # Но лучше, чтобы вызывающий код передавал логгер или обрабатывал логирование
@@ -100,23 +101,62 @@ def get_or_create_direct_chat(conn, user1_id, user2_id, logger):
         logger.error(f"Ошибка при получении/создании direct чата для {user1_id}, {user2_id}: {e}", exc_info=True)
         return None
 
+
 def save_message_to_db(conn, chat_id, sender_id, content_type, content, logger):
-    """Сохраняет сообщение в БД."""
+    message_id_result = None
+    timestamp_result_iso = None
     try:
+        current_utc_time = datetime.now(timezone.utc)
         with conn.cursor() as cur:
+            # 1. Вставляем сообщение
+            logger.debug(
+                f"Попытка INSERT сообщения: chat_id={chat_id}, sender_id={sender_id}, content='{content[:20]}...'")
             cur.execute(
-                "INSERT INTO messages (chat_id, sender_id, content_type, content) VALUES (%s, %s, %s, %s) RETURNING message_id, sent_at",
-                (chat_id, sender_id, content_type, content)
+                "INSERT INTO messages (chat_id, sender_id, content_type, content, sent_at) VALUES (%s, %s, %s, %s, %s) RETURNING message_id, sent_at",
+                (chat_id, sender_id, content_type, content, current_utc_time)
             )
             message_info = cur.fetchone()
-            conn.commit()
+
             if message_info:
-                logger.info(f"Сообщение ID: {message_info[0]} от user_id: {sender_id} в chat_id: {chat_id} сохранено в БД ({message_info[1]}).")
-                return message_info[0]
-        return None
+                message_id_result = message_info[0]
+                db_assigned_sent_at = message_info[1]
+                timestamp_result_iso = db_assigned_sent_at.isoformat()
+                logger.debug(f"Сообщение вставлено, ID: {message_id_result}, Время БД: {timestamp_result_iso}")
+
+                # 2. Обновляем last_message_at в таблице chats
+                logger.debug(f"Попытка UPDATE chats: chat_id={chat_id}, last_message_at={timestamp_result_iso}")
+                cur.execute(
+                    "UPDATE chats SET last_message_at = %s WHERE chat_id = %s",
+                    (db_assigned_sent_at, chat_id)
+                )
+                # Если мы дошли сюда без ошибок, можно коммитить
+                conn.commit()
+                logger.info(
+                    f"Сообщение ID: {message_id_result} от user_id: {sender_id} в chat_id: {chat_id} сохранено, last_message_at обновлено ({timestamp_result_iso}).")
+                return {"message_id": message_id_result, "timestamp": timestamp_result_iso}
+            else:
+                # Этого не должно произойти, если RETURNING что-то вернул, но на всякий случай
+                logger.error(f"INSERT сообщения не вернул message_info для chat_id: {chat_id}, sender_id: {sender_id}")
+                conn.rollback()  # Откатываем, если что-то пошло не так до коммита
+                return None
+
     except psycopg2.Error as e:
-        conn.rollback()
-        logger.error(f"Ошибка при сохранении сообщения в БД (chat_id: {chat_id}, sender_id: {sender_id}): {e}", exc_info=True)
+        logger.error(f"Psycopg2 ошибка в save_message_to_db (chat_id: {chat_id}, sender_id: {sender_id}): {e}",
+                     exc_info=True)
+        if conn:  # Проверяем, что conn не None
+            try:
+                conn.rollback()
+            except psycopg2.Error as rb_e:
+                logger.error(f"Ошибка при откате транзакции: {rb_e}")
+        return None
+    except Exception as e:  # Ловим другие возможные ошибки
+        logger.error(f"Общая ошибка в save_message_to_db (chat_id: {chat_id}, sender_id: {sender_id}): {e}",
+                     exc_info=True)
+        if conn:
+            try:
+                conn.rollback()
+            except psycopg2.Error as rb_e:
+                logger.error(f"Ошибка при откате транзакции: {rb_e}")
         return None
 
 def get_user_chats(conn, user_id, logger):
@@ -187,30 +227,6 @@ def get_user_chats(conn, user_id, logger):
         logger.error(f"Ошибка при получении списка чатов для user_id {user_id}: {e}", exc_info=True)
     return chats_info
 
-def save_message_to_db(conn, chat_id, sender_id, content_type, content, logger):
-    try:
-        with conn.cursor() as cur:
-            cur.execute(
-                "INSERT INTO messages (chat_id, sender_id, content_type, content) VALUES (%s, %s, %s, %s) RETURNING message_id, sent_at", # sent_at уже есть
-                (chat_id, sender_id, content_type, content)
-            )
-            message_info = cur.fetchone() # message_info будет (message_id, sent_at_datetime_object)
-
-            if message_info:
-                sent_at_timestamp = message_info[1]
-                cur.execute(
-                    "UPDATE chats SET last_message_at = %s WHERE chat_id = %s",
-                    (sent_at_timestamp, chat_id)
-                )
-                conn.commit()
-                logger.info(f"Сообщение ID: {message_info[0]} от user_id: {sender_id} в chat_id: {chat_id} сохранено, last_message_at обновлено ({sent_at_timestamp.isoformat()}).")
-                return {"message_id": message_info[0], "timestamp": sent_at_timestamp.isoformat()} # Возвращаем словарь
-        return None
-    except psycopg2.Error as e:
-        conn.rollback()
-        logger.error(f"Ошибка при сохранении сообщения/обновлении чата (chat_id: {chat_id}, sender_id: {sender_id}): {e}", exc_info=True)
-        return None
-
 
 def get_chat_history_from_db(conn, chat_id, limit=50, logger=None):  # limit - сколько сообщений загружать
     """Получает последние 'limit' сообщений для указанного chat_id."""
@@ -243,3 +259,54 @@ def get_chat_history_from_db(conn, chat_id, limit=50, logger=None):  # limit - �
             logger.error(f"Ошибка при получении истории чата {chat_id} из БД: {e}", exc_info=True)
     return messages
 
+
+def create_group_chat_in_db(conn, group_name, creator_id, member_user_ids, logger):
+    """Создает новый групповой чат и добавляет участников."""
+    try:
+        with conn.cursor() as cur:
+            # 1. Создаем запись в таблице chats
+            cur.execute(
+                "INSERT INTO chats (chat_type, chat_name, creator_id) VALUES (%s, %s, %s) RETURNING chat_id",
+                ('group', group_name, creator_id)
+            )
+            new_chat_id = cur.fetchone()[0]
+            logger.info(f"Создан групповой чат '{group_name}' с ID: {new_chat_id} от создателя ID: {creator_id}")
+
+            # 2. Добавляем создателя как админа
+            cur.execute(
+                "INSERT INTO chat_members (chat_id, user_id, role) VALUES (%s, %s, %s)",
+                (new_chat_id, creator_id, 'admin')
+            )
+            logger.info(f"Создатель ID: {creator_id} добавлен в чат {new_chat_id} как админ.")
+
+            # 3. Добавляем остальных участников как мемберов
+            if member_user_ids:
+                # Подготавливаем данные для executemany: список кортежей [(chat_id, user_id, role), ...]
+                member_values = [(new_chat_id, member_id, 'member') for member_id in member_user_ids if
+                                 member_id != creator_id]  # Убедимся, что создателя не добавляем дважды
+                if member_values:  # Если есть кого добавлять
+                    # psycopg2 не имеет простого INSERT ... ON CONFLICT DO NOTHING для executemany без дополнительных ухищрений
+                    # Проще будет проверить существование перед добавлением или обработать ошибку уникальности,
+                    # но для начального добавления при создании группы это не так критично, если member_user_ids уникальны.
+                    # Либо вставлять по одному в цикле с проверкой.
+                    # Пока сделаем простой INSERT. Если пользователь уже есть (чего не должно быть при создании), будет ошибка.
+                    # Или, если хотим быть более устойчивыми, можно так:
+                    for member_id in member_user_ids:
+                        if member_id == creator_id: continue  # Пропускаем создателя
+                        try:
+                            cur.execute(
+                                "INSERT INTO chat_members (chat_id, user_id, role) VALUES (%s, %s, %s)",
+                                (new_chat_id, member_id, 'member')
+                            )
+                            logger.info(f"Участник ID: {member_id} добавлен в чат {new_chat_id} как мембер.")
+                        except psycopg2.Error as e_member:  # Например, если такой участник уже есть (нарушение UNIQUE)
+                            logger.warning(
+                                f"Не удалось добавить участника ID: {member_id} в чат {new_chat_id}: {e_member}")
+                            # Продолжаем добавлять остальных
+
+            conn.commit()
+            return new_chat_id
+    except psycopg2.Error as e:
+        conn.rollback()
+        logger.error(f"Ошибка при создании группового чата '{group_name}': {e}", exc_info=True)
+        return None

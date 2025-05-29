@@ -1,0 +1,16 @@
+2025-05-29 20:33:38,325 - MainWindow - INFO - Инициализация ChatClientWindow...
+2025-05-29 20:33:38,332 - MainWindow - INFO - UI и SocketHandler для ChatClientWindow инициализированы.
+2025-05-29 20:33:47,360 - MainWindow - INFO - Получен запрос на подключение к 127.0.0.1:65432 от ConnectPanel.
+2025-05-29 20:33:47,363 - MainWindow - INFO - СИГНАЛ: Успешно подключено к серверу (через SocketHandler).
+2025-05-29 20:33:47,363 - MainWindow - INFO - UI: Панель аутентификации. Статус: Подключено к 127.0.0.1:65432. Введите данные.
+2025-05-29 20:33:51,824 - MainWindow - INFO - Попытка входа для 1111 через SocketHandler.
+2025-05-29 20:33:51,987 - MainWindow - INFO - СИГНАЛ: Получен статус логина: {'message': 'Успешный вход.', 'status': 'success', 'user_id': 1, 'username': '1111'}
+2025-05-29 20:33:51,987 - MainWindow - INFO - Логин успешен как 1111 (ID: 1).
+2025-05-29 20:33:51,988 - MainWindow - INFO - UI: Панель списка чатов для 1111.
+2025-05-29 20:33:51,988 - MainWindow - INFO - Пользователь 1111 запрашивает список чатов через SocketHandler.
+2025-05-29 20:33:51,990 - MainWindow - INFO - СИГНАЛ: Получен список из 6 чатов.
+2025-05-29 20:33:51,991 - MainWindow - INFO - СИГНАЛ: Получен список из 6 чатов.
+2025-05-29 20:34:05,064 - MainWindow - INFO - Выбран чат из списка (панель): {'chat_id': 6, 'chat_name': 'ввввв', 'chat_type': 'group', 'last_message_at': None, 'last_message_text': 'Нет сообщений', 'other_user_id': None, 'other_username': None, 'unread_count': 0}
+2025-05-29 20:34:05,064 - MainWindow - INFO - UI: Запрос на открытие чата ID 6 (ввввв).
+2025-05-29 20:34:05,065 - MainWindow - INFO - Запрос истории для чата ID: 6 через SocketHandler.
+2025-05-29 20:34:05,068 - MainWindow - INFO - СИГНАЛ: Получена история для чата ID 6 (0 сообщений).

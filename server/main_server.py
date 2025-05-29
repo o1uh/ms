@@ -220,6 +220,13 @@ def handle_client(conn, addr):
                             message_handler.process_request_chat_list(
                                 db_conn, current_user_id, active_clients, send_json_message, server_logger
                             )
+                        elif msg_type == "create_group_request":
+                            message_handler.process_create_group_request(
+                                db_conn, payload, current_username, current_user_id,
+                                active_clients,  # Передаем active_clients для получения conn отправителя
+                                send_json_message,
+                                server_logger
+                            )
                         else:
                             server_logger.warning(
                                 f"Получено сообщение неизвестного типа '{msg_type}' от {current_username}.")

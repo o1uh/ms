@@ -1,0 +1,44 @@
+2025-05-29 20:39:45,945 - ServerApp - INFO - Запуск серверного приложения...
+2025-05-29 20:39:45,946 - ServerApp - INFO - Сервер запущен и слушает на 127.0.0.1:65432
+2025-05-29 20:39:45,946 - ServerApp - INFO - Для остановки сервера нажмите Ctrl+C в этой консоли.
+2025-05-29 20:39:55,634 - ServerApp - INFO - Новое подключение от ('127.0.0.1', 52437)
+2025-05-29 20:39:55,653 - ServerApp - INFO - Успешное подключение к базе данных PostgreSQL.
+2025-05-29 20:39:56,234 - ServerApp - INFO - Новое подключение от ('127.0.0.1', 52439)
+2025-05-29 20:39:56,365 - ServerApp - INFO - Успешное подключение к базе данных PostgreSQL.
+2025-05-29 20:39:58,625 - ServerApp - DEBUG - Получено от ('127.0.0.1', 52437) (аутентификация): {"type": "login", "payload": {"username": "1111", "password": "1111"}}
+2025-05-29 20:39:58,788 - ServerApp - INFO - Клиент ('127.0.0.1', 52437) аутентифицирован как 1111 (ID: 1)
+2025-05-29 20:39:58,789 - ServerApp - INFO - Пользователь ID 1 запросил список чатов.
+2025-05-29 20:39:58,792 - ServerApp - DEBUG - Для user_id 1 найдено 6 чатов.
+2025-05-29 20:39:58,792 - ServerApp - DEBUG - Получено от 1111 (('127.0.0.1', 52437)): {"type": "request_chat_list", "payload": {}}
+2025-05-29 20:39:58,792 - ServerApp - INFO - Пользователь ID 1 запросил список чатов.
+2025-05-29 20:39:58,793 - ServerApp - DEBUG - Для user_id 1 найдено 6 чатов.
+2025-05-29 20:40:01,289 - ServerApp - DEBUG - Получено от ('127.0.0.1', 52439) (аутентификация): {"type": "login", "payload": {"username": "3333", "password": "3333"}}
+2025-05-29 20:40:01,449 - ServerApp - INFO - Клиент ('127.0.0.1', 52439) аутентифицирован как 3333 (ID: 3)
+2025-05-29 20:40:01,449 - ServerApp - INFO - Пользователь ID 3 запросил список чатов.
+2025-05-29 20:40:01,452 - ServerApp - DEBUG - Для user_id 3 найдено 3 чатов.
+2025-05-29 20:40:01,452 - ServerApp - DEBUG - Получено от 3333 (('127.0.0.1', 52439)): {"type": "request_chat_list", "payload": {}}
+2025-05-29 20:40:01,452 - ServerApp - INFO - Пользователь ID 3 запросил список чатов.
+2025-05-29 20:40:01,453 - ServerApp - DEBUG - Для user_id 3 найдено 3 чатов.
+2025-05-29 20:40:06,947 - ServerApp - DEBUG - Получено от 1111 (('127.0.0.1', 52437)): {"type": "request_chat_history", "payload": {"chat_id": 6}}
+2025-05-29 20:40:06,947 - ServerApp - INFO - User_id 1 запросил историю для чата ID 6.
+2025-05-29 20:40:06,947 - ServerApp - DEBUG - Извлечено 0 сообщений для chat_id: 6
+2025-05-29 20:40:08,243 - ServerApp - DEBUG - Получено от 3333 (('127.0.0.1', 52439)): {"type": "request_chat_history", "payload": {"chat_id": 6}}
+2025-05-29 20:40:08,243 - ServerApp - INFO - User_id 3 запросил историю для чата ID 6.
+2025-05-29 20:40:08,243 - ServerApp - DEBUG - Извлечено 0 сообщений для chat_id: 6
+2025-05-29 20:40:11,185 - ServerApp - DEBUG - Получено от 1111 (('127.0.0.1', 52437)): {"type": "send_message_to_chat", "payload": {"chat_id": 6, "text": "1"}}
+2025-05-29 20:40:11,189 - ServerApp - ERROR - Ошибка при сохранении сообщения/обновлении чата (chat_id: 6, sender_id: 1): cursor already closed
+Traceback (most recent call last):
+  File "C:\Users\PC\Desktop\mx\labs\ос\ms\server\db_handler.py", line 119, in save_message_to_db
+    cur.execute(
+    ~~~~~~~~~~~^
+        "UPDATE chats SET last_message_at = %s WHERE chat_id = %s",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        (db_assigned_sent_at, chat_id)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+psycopg2.InterfaceError: cursor already closed
+2025-05-29 20:40:11,194 - ServerApp - ERROR - Сообщение от 1111 в чат 6 не было сохранено в БД.
+2025-05-29 20:43:35,841 - ServerApp - INFO - Получен сигнал KeyboardInterrupt (Ctrl+C)...
+2025-05-29 20:43:35,841 - ServerApp - INFO - Сервер останавливается...
+2025-05-29 20:43:35,841 - ServerApp - INFO - Сервер полностью остановлен.

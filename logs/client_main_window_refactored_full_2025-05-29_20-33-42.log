@@ -1,0 +1,18 @@
+2025-05-29 20:33:42,389 - MainWindow - INFO - Инициализация ChatClientWindow...
+2025-05-29 20:33:42,396 - MainWindow - INFO - UI и SocketHandler для ChatClientWindow инициализированы.
+2025-05-29 20:33:47,864 - MainWindow - INFO - Получен запрос на подключение к 127.0.0.1:65432 от ConnectPanel.
+2025-05-29 20:33:47,866 - MainWindow - INFO - СИГНАЛ: Успешно подключено к серверу (через SocketHandler).
+2025-05-29 20:33:47,866 - MainWindow - INFO - UI: Панель аутентификации. Статус: Подключено к 127.0.0.1:65432. Введите данные.
+2025-05-29 20:33:55,664 - MainWindow - INFO - Попытка входа для 3333 через SocketHandler.
+2025-05-29 20:33:55,826 - MainWindow - INFO - СИГНАЛ: Получен статус логина: {'message': 'Успешный вход.', 'status': 'success', 'user_id': 3, 'username': '3333'}
+2025-05-29 20:33:55,826 - MainWindow - INFO - Логин успешен как 3333 (ID: 3).
+2025-05-29 20:33:55,827 - MainWindow - INFO - UI: Панель списка чатов для 3333.
+2025-05-29 20:33:55,827 - MainWindow - INFO - Пользователь 3333 запрашивает список чатов через SocketHandler.
+2025-05-29 20:33:55,829 - MainWindow - INFO - СИГНАЛ: Получен список из 3 чатов.
+2025-05-29 20:33:55,830 - MainWindow - INFO - СИГНАЛ: Получен список из 3 чатов.
+2025-05-29 20:34:06,111 - MainWindow - INFO - Выбран чат из списка (панель): {'chat_id': 6, 'chat_name': 'ввввв', 'chat_type': 'group', 'last_message_at': None, 'last_message_text': 'Нет сообщений', 'other_user_id': None, 'other_username': None, 'unread_count': 0}
+2025-05-29 20:34:06,111 - MainWindow - INFO - UI: Запрос на открытие чата ID 6 (ввввв).
+2025-05-29 20:34:06,113 - MainWindow - INFO - Запрос истории для чата ID: 6 через SocketHandler.
+2025-05-29 20:34:06,116 - MainWindow - INFO - СИГНАЛ: Получена история для чата ID 6 (0 сообщений).
+2025-05-29 20:34:09,397 - MainWindow - INFO - Отправка сообщения в чат ID 6 (для ввввв): 1 через SocketHandler.
+2025-05-29 20:34:09,411 - MainWindow - WARNING - СИГНАЛ: Уведомление об ошибке от сервера: Ошибка сервера: сообщение не сохранено.

@@ -1,0 +1,81 @@
+2025-05-29 20:37:23,775 - ServerApp - INFO - Запуск серверного приложения...
+2025-05-29 20:37:23,775 - ServerApp - INFO - Сервер запущен и слушает на 127.0.0.1:65432
+2025-05-29 20:37:23,775 - ServerApp - INFO - Для остановки сервера нажмите Ctrl+C в этой консоли.
+2025-05-29 20:37:50,626 - ServerApp - INFO - Новое подключение от ('127.0.0.1', 52415)
+2025-05-29 20:37:50,644 - ServerApp - INFO - Успешное подключение к базе данных PostgreSQL.
+2025-05-29 20:37:51,210 - ServerApp - INFO - Новое подключение от ('127.0.0.1', 52418)
+2025-05-29 20:37:51,336 - ServerApp - INFO - Успешное подключение к базе данных PostgreSQL.
+2025-05-29 20:37:53,794 - ServerApp - DEBUG - Получено от ('127.0.0.1', 52415) (аутентификация): {"type": "login", "payload": {"username": "1111", "password": "1111"}}
+2025-05-29 20:37:53,954 - ServerApp - INFO - Клиент ('127.0.0.1', 52415) аутентифицирован как 1111 (ID: 1)
+2025-05-29 20:37:53,954 - ServerApp - INFO - Пользователь ID 1 запросил список чатов.
+2025-05-29 20:37:53,958 - ServerApp - DEBUG - Для user_id 1 найдено 6 чатов.
+2025-05-29 20:37:53,958 - ServerApp - DEBUG - Получено от 1111 (('127.0.0.1', 52415)): {"type": "request_chat_list", "payload": {}}
+2025-05-29 20:37:53,958 - ServerApp - INFO - Пользователь ID 1 запросил список чатов.
+2025-05-29 20:37:53,958 - ServerApp - DEBUG - Для user_id 1 найдено 6 чатов.
+2025-05-29 20:37:57,170 - ServerApp - DEBUG - Получено от ('127.0.0.1', 52418) (аутентификация): {"type": "login", "payload": {"username": "3333", "password": "3333"}}
+2025-05-29 20:37:57,330 - ServerApp - INFO - Клиент ('127.0.0.1', 52418) аутентифицирован как 3333 (ID: 3)
+2025-05-29 20:37:57,330 - ServerApp - INFO - Пользователь ID 3 запросил список чатов.
+2025-05-29 20:37:57,334 - ServerApp - DEBUG - Для user_id 3 найдено 3 чатов.
+2025-05-29 20:37:57,334 - ServerApp - DEBUG - Получено от 3333 (('127.0.0.1', 52418)): {"type": "request_chat_list", "payload": {}}
+2025-05-29 20:37:57,334 - ServerApp - INFO - Пользователь ID 3 запросил список чатов.
+2025-05-29 20:37:57,334 - ServerApp - DEBUG - Для user_id 3 найдено 3 чатов.
+2025-05-29 20:37:58,091 - ServerApp - DEBUG - Получено от 1111 (('127.0.0.1', 52415)): {"type": "request_chat_history", "payload": {"chat_id": 6}}
+2025-05-29 20:37:58,091 - ServerApp - INFO - User_id 1 запросил историю для чата ID 6.
+2025-05-29 20:37:58,091 - ServerApp - DEBUG - Извлечено 0 сообщений для chat_id: 6
+2025-05-29 20:37:58,818 - ServerApp - DEBUG - Получено от 3333 (('127.0.0.1', 52418)): {"type": "request_chat_history", "payload": {"chat_id": 6}}
+2025-05-29 20:37:58,819 - ServerApp - INFO - User_id 3 запросил историю для чата ID 6.
+2025-05-29 20:37:58,819 - ServerApp - DEBUG - Извлечено 0 сообщений для chat_id: 6
+2025-05-29 20:38:00,322 - ServerApp - DEBUG - Получено от 1111 (('127.0.0.1', 52415)): {"type": "send_message_to_chat", "payload": {"chat_id": 6, "text": "1"}}
+2025-05-29 20:38:00,329 - ServerApp - ERROR - Ошибка при сохранении сообщения/обновлении чата (chat_id: 6, sender_id: 1): null value in column "sent_at" of relation "messages" violates not-null constraint
+DETAIL:  Failing row contains (73, 6, 1, text, 1, null, null, f).
+Traceback (most recent call last):
+  File "C:\Users\PC\Desktop\mx\labs\ос\ms\server\db_handler.py", line 206, in save_message_to_db
+    cur.execute(
+    ~~~~~~~~~~~^
+        "INSERT INTO messages (chat_id, sender_id, content_type, content) VALUES (%s, %s, %s, %s) RETURNING message_id, sent_at", # sent_at уже есть
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        (chat_id, sender_id, content_type, content)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+psycopg2.errors.NotNullViolation: null value in column "sent_at" of relation "messages" violates not-null constraint
+DETAIL:  Failing row contains (73, 6, 1, text, 1, null, null, f).
+
+2025-05-29 20:38:00,334 - ServerApp - ERROR - Сообщение от 1111 в чат 6 не было сохранено в БД.
+2025-05-29 20:38:02,289 - ServerApp - DEBUG - Получено от 1111 (('127.0.0.1', 52415)): {"type": "send_message_to_chat", "payload": {"chat_id": 6, "text": "3"}}
+2025-05-29 20:38:02,291 - ServerApp - ERROR - Ошибка при сохранении сообщения/обновлении чата (chat_id: 6, sender_id: 1): null value in column "sent_at" of relation "messages" violates not-null constraint
+DETAIL:  Failing row contains (74, 6, 1, text, 3, null, null, f).
+Traceback (most recent call last):
+  File "C:\Users\PC\Desktop\mx\labs\ос\ms\server\db_handler.py", line 206, in save_message_to_db
+    cur.execute(
+    ~~~~~~~~~~~^
+        "INSERT INTO messages (chat_id, sender_id, content_type, content) VALUES (%s, %s, %s, %s) RETURNING message_id, sent_at", # sent_at уже есть
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        (chat_id, sender_id, content_type, content)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+psycopg2.errors.NotNullViolation: null value in column "sent_at" of relation "messages" violates not-null constraint
+DETAIL:  Failing row contains (74, 6, 1, text, 3, null, null, f).
+
+2025-05-29 20:38:02,292 - ServerApp - ERROR - Сообщение от 1111 в чат 6 не было сохранено в БД.
+2025-05-29 20:38:04,338 - ServerApp - DEBUG - Получено от 3333 (('127.0.0.1', 52418)): {"type": "send_message_to_chat", "payload": {"chat_id": 6, "text": "2"}}
+2025-05-29 20:38:04,344 - ServerApp - ERROR - Ошибка при сохранении сообщения/обновлении чата (chat_id: 6, sender_id: 3): null value in column "sent_at" of relation "messages" violates not-null constraint
+DETAIL:  Failing row contains (75, 6, 3, text, 2, null, null, f).
+Traceback (most recent call last):
+  File "C:\Users\PC\Desktop\mx\labs\ос\ms\server\db_handler.py", line 206, in save_message_to_db
+    cur.execute(
+    ~~~~~~~~~~~^
+        "INSERT INTO messages (chat_id, sender_id, content_type, content) VALUES (%s, %s, %s, %s) RETURNING message_id, sent_at", # sent_at уже есть
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        (chat_id, sender_id, content_type, content)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+psycopg2.errors.NotNullViolation: null value in column "sent_at" of relation "messages" violates not-null constraint
+DETAIL:  Failing row contains (75, 6, 3, text, 2, null, null, f).
+
+2025-05-29 20:38:04,345 - ServerApp - ERROR - Сообщение от 3333 в чат 6 не было сохранено в БД.
+2025-05-29 20:39:38,948 - ServerApp - INFO - Получен сигнал KeyboardInterrupt (Ctrl+C)...
+2025-05-29 20:39:38,948 - ServerApp - INFO - Сервер останавливается...
+2025-05-29 20:39:38,948 - ServerApp - INFO - Сервер полностью остановлен.

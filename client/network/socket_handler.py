@@ -23,6 +23,7 @@ class SocketHandler(QObject):  # Наследуемся от QObject для ис
     connected_to_server = Signal()
     disconnected_from_server = Signal()
     socket_error_occurred = Signal(QAbstractSocket.SocketError, str)  # ошибка сокета, строка ошибки
+    create_group_response_received = Signal(dict)  # НОВЫЙ СИГНАЛ
 
     # Сигналы для различных ответов от сервера
     login_status_received = Signal(dict)  # payload от login_status
@@ -128,6 +129,8 @@ class SocketHandler(QObject):  # Наследуемся от QObject для ис
                     self.chat_history_received.emit(payload)
                 elif msg_type == "incoming_chat_message":
                     self.incoming_message_received.emit(payload)
+                elif msg_type == "create_group_response":
+                    self.create_group_response_received.emit(payload)
                 elif msg_type == "error_notification":
                     self.error_notification_received.emit(payload)
                 else:

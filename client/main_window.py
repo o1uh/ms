@@ -47,6 +47,8 @@ class ChatClientWindow(QWidget):  # Или QMainWindow
         self.socket_handler.incoming_message_received.connect(self.handle_incoming_chat_message)
         self.socket_handler.error_notification_received.connect(self.handle_error_notification)
         self.socket_handler.unknown_message_received.connect(self.handle_unknown_message)
+        #self.socket_handler.create_group_response_received = Signal(dict)
+        self.socket_handler.create_group_response_received.connect(self.handle_create_group_response)
 
         self.current_username = None
         self.current_user_id = None
@@ -79,7 +81,9 @@ class ChatClientWindow(QWidget):  # Или QMainWindow
 
         # 3. Панель списка чатов
         self.chat_list_panel_widget = ChatListPanel(self)
-        self.chat_list_panel_widget.request_new_chat.connect(self.on_request_new_chat_from_panel)
+        self.chat_list_panel_widget.request_new_direct_chat.connect(
+            self.on_request_new_direct_chat_from_panel)  # Измененный сигнал
+        self.chat_list_panel_widget.request_create_group.connect(self.attempt_create_group)  # Новый сигнал
         self.chat_list_panel_widget.chat_selected.connect(self.on_chat_selected_from_panel)
         self.chat_list_panel_widget.refresh_list_requested.connect(self.attempt_request_chat_list)
         self.stacked_widget.addWidget(self.chat_list_panel_widget)
@@ -166,6 +170,24 @@ class ChatClientWindow(QWidget):  # Или QMainWindow
         # Если chat_id is None, то configure_chat уже отобразит "Начните новый диалог..."
 
     # --- Методы-инициаторы действий (вызывают методы SocketHandler) ---
+    @Slot(str, list)  # Слот для сигнала от ChatListPanel
+    def attempt_create_group(self, group_name: str, member_usernames: list):
+        if not self.current_user_id: return
+        main_window_logger.info(
+            f"Попытка создания группы '{group_name}' с участниками {member_usernames} через SocketHandler.")
+        self.status_label.setText(f"Статус: Создание группы '{group_name}'...")
+        # Можно временно заблокировать кнопки на ChatListPanel
+        # self.chat_list_panel_widget.set_buttons_enabled(False)
+
+        message_data = {
+            "type": "create_group_request",
+            "payload": {
+                "group_name": group_name,
+                "member_usernames": member_usernames
+            }
+        }
+        self.socket_handler.send_json_message(message_data)
+
     @Slot(str, int)  # Слот для сигнала от ConnectPanel
     def attempt_server_connection(self, host: str, port: int):
         main_window_logger.info(f"Получен запрос на подключение к {host}:{port} от ConnectPanel.")
@@ -252,27 +274,26 @@ class ChatClientWindow(QWidget):  # Или QMainWindow
             # Обновление UI после отправки (например, очистка поля ввода) должно быть в ChatPanel
 
     # --- Обработчики действий UI, связанных с чатами (вызываются из ChatListPanel) ---
-    @Slot(str)  # Слот для сигнала request_new_chat от ChatListPanel
-    def on_request_new_chat_from_panel(self, target_username: str):
+    @Slot(str)
+    def on_request_new_direct_chat_from_panel(self, target_username: str):  # Измененный слот
+        # ... (логика такая же, как была в on_start_or_open_chat_with_user,
+        #      но теперь она только для личных чатов) ...
         if not self.current_user_id: return
-        if not target_username:
-            QMessageBox.warning(self, "Новый чат", "Введите имя пользователя.")
-            return
-        if target_username == self.current_username:
-            QMessageBox.warning(self, "Новый чат", "Нельзя начать чат с самим собой.")
-            return
-
-        main_window_logger.info(f"Запрос на новый/существующий чат с {target_username} от панели.")
-
-        # 1. Проверяем, есть ли уже такой чат в загруженном списке
+        if not target_username: QMessageBox.warning(self, "Новый чат", "Введите имя пользователя."); return
+        if target_username == self.current_username: QMessageBox.warning(self, "Новый чат",
+                                                                         "Нельзя начать чат с самим собой."); return
+        main_window_logger.info(f"Запрос на новый/существующий личный чат с {target_username} от панели.")
+        # Поиск в существующем списке
         for i in range(self.chat_list_panel_widget.chat_list_widget.count()):
             item = self.chat_list_panel_widget.chat_list_widget.item(i)
             chat_data = item.data(Qt.UserRole)
             if chat_data and chat_data.get("chat_type") == "direct" and chat_data.get(
                     "other_username") == target_username:
-                main_window_logger.info(f"Чат с {target_username} уже есть в списке. Открываем.")
-                self.open_chat_from_data(chat_data)  # Используем данные из элемента списка
+                self.open_chat_from_data(chat_data);
                 return
+        # Если не найден, открываем как новый (сервер создаст при первом сообщении или по спец. запросу)
+        main_window_logger.info(f"Новый личный диалог с {target_username}. Открытие панели чата (ID пока не известен).")
+        self.show_specific_chat_panel_ui_action(None, target_username)
 
         # 2. Если чата нет в списке - это новый диалог.
         #    Мы не знаем chat_id. Сервер его создаст при первой отправке сообщения.
@@ -452,3 +473,29 @@ class ChatClientWindow(QWidget):  # Или QMainWindow
         # так как handle_disconnected_from_server обычно вызывается после этого и обновляет UI.
         if socket_error_enum != QAbstractSocket.SocketError.RemoteHostClosedError:
             QMessageBox.critical(self, "Ошибка сокета", f"Произошла ошибка: {error_string}")
+
+    @Slot(dict)  # НУЖНО ДОБАВИТЬ ЭТОТ МЕТОД-ОБРАБОТЧИК
+    def handle_create_group_response(self, payload: dict):
+        main_window_logger.info(f"СИГНАЛ: Получен ответ на создание группы: {payload}")
+        status = payload.get("status")
+        msg = payload.get("message")
+
+        # Разблокируем кнопки на ChatListPanel, если блокировали
+        # if hasattr(self, 'chat_list_panel_widget'):
+        #    self.chat_list_panel_widget.set_buttons_enabled(True)
+
+        if status == "success":
+            QMessageBox.information(self, "Создание группы", msg)
+            # Обновляем список чатов, чтобы увидеть новую группу
+            self.attempt_request_chat_list()
+            # Можно сразу открыть созданный чат, если сервер вернул chat_id и chat_name
+            new_chat_id = payload.get("chat_id")
+            new_chat_name = payload.get("chat_name")
+            if new_chat_id and new_chat_name:
+                self.show_specific_chat_panel_ui_action(new_chat_id, new_chat_name)
+        else:
+            QMessageBox.warning(self, "Ошибка создания группы", msg)
+
+        # Убедимся, что статусбар обновлен, если мы на панели списка чатов
+        if self.stacked_widget.currentWidget() == self.chat_list_panel_widget:
+            self.status_label.setText(f"Статус: Список чатов ({self.current_username})")

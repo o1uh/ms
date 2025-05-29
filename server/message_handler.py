@@ -172,3 +172,57 @@ def process_send_message_to_chat(db_conn, payload, current_username, current_use
                         "timestamp": message_timestamp
                     }
                 })
+
+
+def process_create_group_request(db_conn, payload, current_username, current_user_id, active_clients,
+                                 send_json_message_func, logger):
+    group_name = payload.get("group_name")
+    member_usernames = payload.get("member_usernames", [])  # Список никнеймов
+
+    current_user_conn = active_clients[current_username]['conn']  # Соединение отправителя
+
+    if not group_name:
+        send_json_message_func(current_user_conn, {"type": "create_group_response", "payload": {"status": "error",
+                                                                                                "message": "Название группы не может быть пустым."}})
+        return
+
+    # Преобразуем member_usernames в member_user_ids, проверяя их существование
+    member_user_ids = []
+    valid_members = True
+    if member_usernames:  # Если список не пуст
+        for uname in member_usernames:
+            if uname == current_username: continue  # Создателя не добавляем через этот список
+            user_data = db_handler.get_user_from_db(db_conn, uname, logger)
+            if user_data:
+                member_user_ids.append(user_data["user_id"])
+            else:
+                logger.warning(f"При создании группы '{group_name}' не найден пользователь '{uname}'.")
+                send_json_message_func(current_user_conn, {"type": "create_group_response",
+                                                           "payload": {"status": "error",
+                                                                       "message": f"Пользователь '{uname}' для добавления в группу не найден."}})
+                valid_members = False
+                break
+        if not valid_members:
+            return
+
+    # Убираем дубликаты ID, если вдруг передали одного и того же пользователя несколько раз
+    member_user_ids = list(set(member_user_ids))
+
+    new_chat_id = db_handler.create_group_chat_in_db(db_conn, group_name, current_user_id, member_user_ids, logger)
+
+    if new_chat_id:
+        send_json_message_func(current_user_conn, {
+            "type": "create_group_response",
+            "payload": {
+                "status": "success",
+                "message": f"Группа '{group_name}' успешно создана.",
+                "chat_id": new_chat_id,
+                "chat_name": group_name,
+                "chat_type": "group"
+            }
+        })
+        # TODO: Оповестить добавленных участников о том, что их добавили в группу
+        # (пока не делаем, они увидят группу при следующем запросе списка чатов)
+    else:
+        send_json_message_func(current_user_conn, {"type": "create_group_response", "payload": {"status": "error",
+                                                                                                "message": "Не удалось создать группу."}})
