@@ -1,9 +1,5 @@
-# server/auth_handler.py
 import hashlib
 import secrets
-# Мы можем захотеть логировать действия внутри этих функций в будущем,
-# поэтому можно предусмотреть передачу логгера.
-# Пока оставим без прямого логирования здесь, оно будет в вызывающем коде.
 
 def generate_salt():
     """Генерирует случайную соль."""
@@ -29,9 +25,3 @@ def verify_password(stored_password_hash, salt, provided_password):
     hashed_provided_password = hash_password(provided_password, salt)
     # Сравниваем полученный хэш с сохраненным
     return stored_password_hash == hashed_provided_password
-
-# В будущем здесь могут быть функции типа:
-# def process_registration(db_conn, payload, logger): ...
-# def process_login(db_conn, payload, logger): ...
-# Но пока основную логику оставим в main_server.py/handle_client,
-# а отсюда будем вызывать только generate_salt, hash_password, verify_password.

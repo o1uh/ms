@@ -1,4 +1,3 @@
-# server/message_handler.py
 import json
 import psycopg2
 from server import db_handler
@@ -12,14 +11,6 @@ def process_request_chat_list(db_conn, current_user_id, active_clients, send_jso
     user_chats = db_handler.get_user_chats(db_conn, current_user_id, logger)
 
     current_user_conn = None
-    # Мы не используем clients_lock здесь, так как предполагаем, что current_user_id
-    # соответствует активному пользователю, чье соединение мы ищем.
-    # active_clients должен содержать {username: {'conn': ..., 'user_id': ...}}
-    # Нужно найти conn по user_id. Это неудобно.
-    # Лучше, чтобы active_clients был {user_id: {'conn': ..., 'username': ...}}
-    # ИЛИ чтобы send_json_message_func принимала user_id и сама находила conn.
-    # ПОКА ОСТАВИМ КАК ЕСТЬ, НО ЭТО МЕСТО ДЛЯ УЛУЧШЕНИЯ active_clients.
-    # Временно найдем по user_id перебором (неэффективно, но для примера)
     for username, client_data in active_clients.items():
         if client_data['user_id'] == current_user_id:
             current_user_conn = client_data['conn']
@@ -38,7 +29,7 @@ def process_request_chat_list(db_conn, current_user_id, active_clients, send_jso
 # --- Модифицированная функция для запроса истории ---
 def process_request_chat_history(db_conn, payload, current_user_id, active_clients, send_json_message_func, logger):
     """Обрабатывает запрос на получение истории чата по chat_id."""
-    chat_id_to_request = payload.get("chat_id")  # Теперь ожидаем chat_id
+    chat_id_to_request = payload.get("chat_id")
 
     current_user_conn = None  # Аналогично предыдущей функции, ищем conn
     for username, client_data in active_clients.items():
@@ -52,10 +43,6 @@ def process_request_chat_history(db_conn, payload, current_user_id, active_clien
         send_json_message_func(current_user_conn, {"type": "error_notification",
                                                    "payload": {"message": "Не указан ID чата для запроса истории."}})
         return
-
-    # TODO: Проверка, имеет ли current_user_id доступ к этому chat_id (является ли участником)
-    # Это важный аспект безопасности, который нужно будет добавить.
-    # Пока предполагаем, что клиент запрашивает только свои чаты.
 
     logger.info(f"User_id {current_user_id} запросил историю для чата ID {chat_id_to_request}.")
     history_messages = db_handler.get_chat_history_from_db(db_conn, chat_id_to_request, limit=50, logger=logger)
@@ -82,9 +69,6 @@ def process_send_message_to_chat(db_conn, payload, current_username, current_use
     if current_username in active_clients:  # Проверка на случай, если ключ username
         sender_conn = active_clients[current_username]['conn']
     else:  # Если active_clients индексируется по user_id или другая структура
-        # Нужно будет найти sender_conn другим способом, если current_username не ключ
-        # Например, если бы мы передавали conn отправителя напрямую:
-        # sender_conn = current_user_conn
         logger.error(
             f"Не найдено соединение для отправителя {current_username} в active_clients. Невозможно отправить ответ/ошибку.")
         # В этом случае, если sender_conn не найден, отправка ошибок отправителю не сработает.
@@ -151,13 +135,8 @@ def process_send_message_to_chat(db_conn, payload, current_username, current_use
     logger.debug(
         f"Участники чата {target_chat_id} для рассылки (кроме {current_user_id} - {current_username}): {chat_participants_ids}")
 
-    # Рассылаем сообщение всем ОНЛАЙН участникам чата
-    # Мы не можем напрямую итерировать и изменять active_clients под блокировкой,
-    # поэтому сначала соберем информацию о тех, кому нужно отправить.
-    # Но для простого чтения и отправки итерация под блокировкой допустима.
     with clients_lock:
         for other_username, client_data_receiver in active_clients.items():
-            # Проверяем, есть ли 'user_id' в client_data и совпадает ли он с одним из участников
             if client_data_receiver.get('user_id') in chat_participants_ids:
                 logger.info(
                     f"Доставка сообщения (ID: {saved_message_id}) от {current_username} участнику {other_username} (ID: {client_data_receiver['user_id']}) чата {target_chat_id}.")
@@ -221,8 +200,6 @@ def process_create_group_request(db_conn, payload, current_username, current_use
                 "chat_type": "group"
             }
         })
-        # TODO: Оповестить добавленных участников о том, что их добавили в группу
-        # (пока не делаем, они увидят группу при следующем запросе списка чатов)
     else:
         send_json_message_func(current_user_conn, {"type": "create_group_response", "payload": {"status": "error",
                                                                                                 "message": "Не удалось создать группу."}})
@@ -274,11 +251,6 @@ def process_initiate_direct_chat(db_conn, payload, current_username, current_use
         }
         send_json_message_func(sender_conn, {"type": "initiate_direct_chat_response", "payload": response_payload})
 
-        # После успешной инициации чата (особенно если он новый),
-        # хорошо бы обновить список чатов у инициатора
-        # Это можно сделать, отправив ему обновленный chat_list_response,
-        # или клиент сам запросит обновление после перехода в панель чатов.
-        # Пока оставим так, клиент запросит историю сам.
     else:
         logger.error(f"Не удалось получить/создать chat_id для диалога между {current_username} и {target_username}.")
         send_json_message_func(sender_conn, {"type": "initiate_direct_chat_response", "payload": {"status": "error",

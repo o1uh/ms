@@ -1,12 +1,6 @@
-# client/widgets/auth_panel.py
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox
 from PySide6.QtCore import Signal, Slot
 
-
-# Логгер (опционально для этого файла, можно логировать в main_window)
-# import sys, os
-# ... (настройка пути и импорт logger) ...
-# auth_panel_logger = setup_logger('AuthPanel', 'client_auth_panel')
 
 class AuthPanel(QWidget):
     # Сигналы: username, password
@@ -45,7 +39,7 @@ class AuthPanel(QWidget):
         layout.addWidget(self.password_label)
         layout.addWidget(self.password_input)
         layout.addLayout(buttons_layout)
-        layout.addStretch(1)  # Чтобы элементы были вверху
+        layout.addStretch(1)
 
         self.setLayout(layout)
 
@@ -56,7 +50,7 @@ class AuthPanel(QWidget):
     @Slot()
     def _on_login_clicked(self):
         username = self.username_input.text().strip()
-        password = self.password_input.text()  # Пароль не тримим
+        password = self.password_input.text()
 
         if not username or not password:
             QMessageBox.warning(self, "Вход", "Имя пользователя и пароль не могут быть пустыми.")

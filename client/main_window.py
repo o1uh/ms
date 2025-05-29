@@ -1,4 +1,3 @@
-# client/main_window.py
 import sys
 import json
 from datetime import datetime
@@ -50,12 +49,12 @@ class ChatClientWindow(QWidget):  # Или QMainWindow
         #self.socket_handler.create_group_response_received = Signal(dict)
         self.socket_handler.create_group_response_received.connect(self.handle_create_group_response)
         self.socket_handler.initiate_direct_chat_response_received.connect(
-        self.handle_initiate_direct_chat_response)  # НОВОЕ ПОДКЛЮЧЕНИЕ
+        self.handle_initiate_direct_chat_response)
 
         self.current_username = None
         self.current_user_id = None
         self.active_chat_id = None
-        self.active_chat_name = None  # Имя собеседника или группы для отображения
+        self.active_chat_name = None
 
         self.init_ui_with_panels()
         self.switch_to_panel(self.connect_panel_widget)
@@ -84,8 +83,8 @@ class ChatClientWindow(QWidget):  # Или QMainWindow
         # 3. Панель списка чатов
         self.chat_list_panel_widget = ChatListPanel(self)
         self.chat_list_panel_widget.request_new_direct_chat.connect(
-            self.on_request_new_direct_chat_from_panel)  # Измененный сигнал
-        self.chat_list_panel_widget.request_create_group.connect(self.attempt_create_group)  # Новый сигнал
+            self.on_request_new_direct_chat_from_panel)
+        self.chat_list_panel_widget.request_create_group.connect(self.attempt_create_group)
         self.chat_list_panel_widget.chat_selected.connect(self.on_chat_selected_from_panel)
         self.chat_list_panel_widget.refresh_list_requested.connect(self.attempt_request_chat_list)
         self.stacked_widget.addWidget(self.chat_list_panel_widget)
@@ -104,7 +103,7 @@ class ChatClientWindow(QWidget):  # Или QMainWindow
         is_authenticated = self.current_user_id is not None
 
         # Управляем состоянием кнопок на каждой панели
-        if hasattr(self, 'connect_panel_widget'):  # Проверка на случай вызова до полной инициализации
+        if hasattr(self, 'connect_panel_widget'):
             self.connect_panel_widget.set_button_enabled(panel_widget == self.connect_panel_widget and not is_connected)
 
         if hasattr(self, 'auth_panel_widget'):
@@ -130,17 +129,17 @@ class ChatClientWindow(QWidget):  # Или QMainWindow
             return
         self.active_chat_id = None
         self.active_chat_name = None
-        self.active_chat_data = None  # Сбрасываем активный чат
+        self.active_chat_data = None
         self.switch_to_panel(self.chat_list_panel_widget)
         self.status_label.setText(f"Статус: Вы вошли как {self.current_username} (ID: {self.current_user_id})")
         main_window_logger.info(f"UI: Панель списка чатов для {self.current_username}.")
         self.attempt_request_chat_list()  # Запрашиваем список чатов при каждом показе
 
     def show_connect_panel_ui_action(self, message="Отключен"):
-        self.active_chat_id = None;
-        self.active_chat_name = None;
-        self.active_chat_data = None  # Сброс активного чата
-        self.current_username = None;
+        self.active_chat_id = None
+        self.active_chat_name = None
+        self.active_chat_data = None
+        self.current_username = None
         self.current_user_id = None  # Сброс пользователя
         self.switch_to_panel(self.connect_panel_widget)
         self.status_label.setText(f"Статус: {message}")
@@ -149,8 +148,8 @@ class ChatClientWindow(QWidget):  # Или QMainWindow
         main_window_logger.info(f"UI: Панель подключения. Статус: {message}")
 
     def show_auth_panel_ui_action(self, message="Введите данные для входа/регистрации"):
-        self.active_chat_id = None;
-        self.active_chat_name = None;
+        self.active_chat_id = None
+        self.active_chat_name = None
         self.active_chat_data = None
         self.switch_to_panel(self.auth_panel_widget)
         self.status_label.setText(f"Статус: {message}")
@@ -236,10 +235,10 @@ class ChatClientWindow(QWidget):  # Или QMainWindow
 
     @Slot(str)
     def attempt_send_message_to_active_chat(self, text: str):
-        if not self.current_user_id:  # ...
+        if not self.current_user_id:
             if not text: return
 
-        if self.active_chat_id is None:  # Этого теперь не должно происходить, если чат открывается только после initiate_direct_chat
+        if self.active_chat_id is None:
             QMessageBox.warning(self, "Ошибка", "Чат не выбран или ID чата не определен.")
             main_window_logger.error("Попытка отправки сообщения, когда active_chat_id is None (ошибка логики).")
             return
@@ -267,7 +266,7 @@ class ChatClientWindow(QWidget):  # Или QMainWindow
 
         main_window_logger.info(f"Инициация чата с {target_username} через SocketHandler.")
         self.status_label.setText(f"Открытие чата с {target_username}...")
-        # Блокируем кнопку на время запроса (опционально)
+        # Блокируем кнопку на время запроса
         # self.chat_list_panel_widget.start_direct_chat_button.setEnabled(False)
 
         message_data = {"type": "initiate_direct_chat", "payload": {"target_username": target_username}}
@@ -396,7 +395,6 @@ class ChatClientWindow(QWidget):  # Или QMainWindow
         """Обработка события закрытия окна."""
         main_window_logger.info("Окно клиента закрывается. Отключение от сервера через SocketHandler.")
         self.socket_handler.disconnect_from_host()
-        # waitForDisconnected здесь не нужен, т.к. приложение и так закрывается.
         event.accept()
 
     @Slot()  # Явно помечаем как слот Qt
@@ -406,7 +404,6 @@ class ChatClientWindow(QWidget):  # Или QMainWindow
         # но в момент сигнала connected он должен быть доступен.
         peer_info = self.socket_handler.get_peer_address_info()
         self.show_auth_panel_ui_action(f"Подключено к {peer_info if peer_info else 'серверу'}. Введите данные.")
-        # Убедимся, что кнопка подключения на ConnectPanel деактивирована
         if hasattr(self, 'connect_panel_widget'):
             self.connect_panel_widget.set_button_enabled(False)
 
@@ -417,7 +414,7 @@ class ChatClientWindow(QWidget):  # Или QMainWindow
         self.current_user_id = None
         self.active_chat_id = None
         self.active_chat_name = None
-        # self.active_chat_data = None # Если вы его использовали
+        # self.active_chat_data = None
 
         if hasattr(self, 'chat_list_panel_widget'):  # Проверка на существование атрибута
             self.chat_list_panel_widget.update_chat_list([])  # Очищаем список чатов
@@ -426,7 +423,6 @@ class ChatClientWindow(QWidget):  # Или QMainWindow
 
         # Переключаемся на панель подключения и обновляем статус
         self.show_connect_panel_ui_action("Соединение с сервером разорвано.")
-        # QMessageBox здесь обычно не нужен, так как UI уже обновился
         # QMessageBox.information(self, "Отключено", "Соединение с сервером потеряно или закрыто.")
 
     @Slot(QAbstractSocket.SocketError, str)  # Указываем типы аргументов для слота
@@ -447,15 +443,11 @@ class ChatClientWindow(QWidget):  # Или QMainWindow
         if socket_error_enum != QAbstractSocket.SocketError.RemoteHostClosedError:
             QMessageBox.critical(self, "Ошибка сокета", f"Произошла ошибка: {error_string}")
 
-    @Slot(dict)  # НУЖНО ДОБАВИТЬ ЭТОТ МЕТОД-ОБРАБОТЧИК
+    @Slot(dict)
     def handle_create_group_response(self, payload: dict):
         main_window_logger.info(f"СИГНАЛ: Получен ответ на создание группы: {payload}")
         status = payload.get("status")
         msg = payload.get("message")
-
-        # Разблокируем кнопки на ChatListPanel, если блокировали
-        # if hasattr(self, 'chat_list_panel_widget'):
-        #    self.chat_list_panel_widget.set_buttons_enabled(True)
 
         if status == "success":
             QMessageBox.information(self, "Создание группы", msg)
@@ -468,8 +460,6 @@ class ChatClientWindow(QWidget):  # Или QMainWindow
                 self.show_specific_chat_panel_ui_action(new_chat_id, new_chat_name)
         else:
             QMessageBox.warning(self, "Ошибка создания группы", msg)
-
-        # Убедимся, что статусбар обновлен, если мы на панели списка чатов
         if self.stacked_widget.currentWidget() == self.chat_list_panel_widget:
             self.status_label.setText(f"Статус: Список чатов ({self.current_username})")
 
@@ -477,10 +467,6 @@ class ChatClientWindow(QWidget):  # Или QMainWindow
     def handle_initiate_direct_chat_response(self, payload: dict):
         main_window_logger.info(f"СИГНАЛ: Получен ответ на инициацию чата: {payload}")
         status = payload.get("status")
-
-        # Разблокируем кнопку на ChatListPanel, если блокировали
-        # if hasattr(self, 'chat_list_panel_widget'):
-        #    self.chat_list_panel_widget.start_direct_chat_button.setEnabled(True)
 
         if status == "success":
             chat_id = payload.get("chat_id")

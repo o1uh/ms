@@ -1,4 +1,3 @@
-## client/widgets/chat_list_panel.py
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QListWidget, QListWidgetItem, QMessageBox
 from PySide6.QtCore import Signal, Slot, Qt
 
@@ -77,7 +76,7 @@ class ChatListPanel(QWidget):
             QMessageBox.warning(self, "Личный чат", "Введите имя пользователя.")
 
     @Slot()
-    def _on_start_direct_chat_clicked(self):  # Этот метод теперь просто испускает сигнал
+    def _on_start_direct_chat_clicked(self):
         target_username = self.new_direct_chat_user_input.text().strip()
         if target_username:  # Базовая проверка, остальную валидацию сделает main_window
             self.request_new_direct_chat.emit(target_username)
@@ -125,11 +124,10 @@ class ChatListPanel(QWidget):
                 self.chat_list_widget.addItem(list_item)
 
     def set_buttons_enabled(self, enabled: bool):
-        self.start_direct_chat_button.setEnabled(enabled)  # Управляем кнопкой для личного чата
-        self.create_group_button.setEnabled(enabled)  # Управляем кнопкой для создания группы
+        self.start_direct_chat_button.setEnabled(enabled)
+        self.create_group_button.setEnabled(enabled)
         self.refresh_chat_list_button.setEnabled(enabled)
         self.chat_list_widget.setEnabled(enabled)
-        # Поля ввода тоже можно блокировать/разблокировать, если нужно
         self.new_direct_chat_user_input.setEnabled(enabled)
         self.new_group_name_input.setEnabled(enabled)
         self.new_group_members_input.setEnabled(enabled)

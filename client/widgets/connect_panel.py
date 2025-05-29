@@ -1,9 +1,7 @@
-# client/widgets/connect_panel.py
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton
 from PySide6.QtCore import Signal, Slot
 
 
-# Логгер можно импортировать так же, как в main_window.py, если он нужен здесь для детального логирования
 # import sys, os
 # CURRENT_DIR_CP = os.path.dirname(os.path.abspath(__file__)) # client/widgets
 # CLIENT_DIR_CP = os.path.dirname(CURRENT_DIR_CP) # client/
@@ -14,7 +12,6 @@ from PySide6.QtCore import Signal, Slot
 
 class ConnectPanel(QWidget):
     # Сигнал, который будет испускаться при попытке подключения
-    # Передает host (str) и port (int)
     connect_requested = Signal(str, int)
 
     def __init__(self, parent=None):
@@ -38,7 +35,6 @@ class ConnectPanel(QWidget):
         layout.addWidget(self.port_label)
         layout.addWidget(self.port_input)
         layout.addWidget(self.connect_button)
-        layout.addStretch(1)  # Чтобы элементы были вверху
 
         self.setLayout(layout)
 
@@ -48,13 +44,6 @@ class ConnectPanel(QWidget):
         port_str = self.port_input.text().strip()
 
         if not host or not port_str:
-            # Здесь можно было бы испустить сигнал ошибки или показать QMessageBox
-            # Но пока что валидацию оставим в main_window, а панель просто передаст данные
-            # connect_panel_logger.warning("IP или порт не введены.")
-            # QMessageBox.warning(self, "Ошибка", "IP адрес и порт не могут быть пустыми.")
-            # Для простоты, панель просто испускает сигнал, а main_window валидирует.
-            # Либо панель может сама валидировать и испускать сигнал только если все ок.
-            # Давайте сделаем валидацию прямо здесь, чтобы панель была более самостоятельной.
             from PySide6.QtWidgets import QMessageBox  # Локальный импорт для QMessageBox
             QMessageBox.warning(self, "Подключение", "IP адрес и порт не могут быть пустыми.")
             return

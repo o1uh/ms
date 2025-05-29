@@ -1,4 +1,3 @@
-# server/main_server.py
 import socket
 import threading
 import json
@@ -6,7 +5,6 @@ import sys
 import os
 
 # --- Настройка путей и импортов ---
-# Добавляем путь к корневой папке проекта, чтобы найти logger.py
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 from logger import setup_logger
 
@@ -34,11 +32,7 @@ def send_json_message(conn, message_data):
         # Используем ensure_ascii=False для корректной отправки кириллицы без \uXXXX
         json_message = json.dumps(message_data, ensure_ascii=False) + '\n'
         conn.sendall(json_message.encode('utf-8'))
-        # Для лога можно использовать peername, если conn еще жив
-        # server_logger.debug(f"Отправлено {conn.getpeername()}: {json_message.strip()}")
     except Exception as e:
-        # server_logger.error(f"Ошибка отправки сообщения {conn.getpeername()}: {e}", exc_info=True)
-        # Если conn уже закрыт, getpeername() вызовет ошибку. Логируем осторожно.
         server_logger.error(f"Ошибка отправки сообщения: {e}", exc_info=True)
 
 
@@ -216,11 +210,11 @@ def handle_client(conn, addr):
                                 send_json_message,
                                 server_logger
                             )
-                        elif msg_type == "request_chat_list":  # Повторный запрос списка чатов
+                        elif msg_type == "request_chat_list":
                             message_handler.process_request_chat_list(
                                 db_conn, current_user_id, active_clients, send_json_message, server_logger
                             )
-                        elif msg_type == "initiate_direct_chat":  # НОВЫЙ ТИП
+                        elif msg_type == "initiate_direct_chat":
                             message_handler.process_initiate_direct_chat(
                                 db_conn, payload, current_username, current_user_id,
                                 active_clients,  # Нужен для получения conn отправителя
@@ -284,7 +278,7 @@ def handle_client(conn, addr):
         server_logger.debug(f"Ресурсы для {addr} (пользователь: {current_username}) освобождены.")
 
 
-# --- Функция запуска сервера (остается почти такой же) ---
+# --- Функция запуска сервера ---
 def run_server():
     global server_running
     # Создаем слушающий сокет один раз при запуске сервера
@@ -319,12 +313,6 @@ def run_server():
     finally:
         server_running = False  # Сигнал всем потокам handle_client завершаться
         server_logger.info("Сервер останавливается...")
-
-        # Даем немного времени потокам завершиться. В идеале - join для каждого потока.
-        # Но это усложнит управление списком потоков.
-        # threading.enumerate() может помочь, но нужно аккуратно.
-        # Пока оставим так, потоки-демоны должны завершиться.
-
         listening_socket.close()  # Закрываем слушающий сокет
         server_logger.info("Сервер полностью остановлен.")
 

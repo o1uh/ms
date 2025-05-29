@@ -1,7 +1,6 @@
-# client/widgets/chat_panel.py
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QTextEdit, QMessageBox
 from PySide6.QtCore import Signal, Slot
-from datetime import datetime  # Для форматирования времени своего сообщения
+from datetime import datetime  # Для форматирования времени
 
 
 class ChatPanel(QWidget):
@@ -91,15 +90,6 @@ class ChatPanel(QWidget):
             return  # Не отправляем пустое сообщение
 
         if self._current_chat_id is None:
-            # Это логика для нового чата, где ID еще не известен.
-            # Главное окно должно будет обработать этот случай:
-            # сначала "создать" чат на сервере (по именам участников), получить ID,
-            # а потом уже отправить сообщение с этим ID.
-            # Пока что, панель просто испустит сигнал с текстом,
-            # а main_window должен будет решить, как получить chat_id.
-            # Или, эта кнопка должна быть неактивна, пока chat_id не известен.
-            # Для простоты, пока испускаем сигнал, а main_window разберется.
-            # Это место для улучшения: панель не должна отправлять, если не знает ID.
             QMessageBox.warning(self, "Отправка",
                                 "ID чата еще не определен. Попробуйте после обновления списка чатов или это новый чат (отправка пока не реализована без ID).")
             return

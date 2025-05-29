@@ -1,9 +1,8 @@
-# client/network/socket_handler.py
 import json
 from PySide6.QtNetwork import QTcpSocket, QAbstractSocket
-from PySide6.QtCore import QObject, Signal  # QObject для сигналов
+from PySide6.QtCore import QObject, Signal
 
-# Импортируем логгер. Предполагаем, что logger.py в корне проекта.
+
 import sys
 import os
 
@@ -60,7 +59,6 @@ class SocketHandler(QObject):  # Наследуемся от QObject для ис
         socket_logger.info("Отключение от хоста...")
         if self.socket.state() != QAbstractSocket.UnconnectedState:
             self.socket.disconnectFromHost()
-            # Можно добавить waitForDisconnected, если это критично, но обычно disconnectFromHost достаточно
             # if self.socket.state() != QAbstractSocket.UnconnectedState:
             #     self.socket.waitForDisconnected(1000) # Таймаут 1 сек
 
@@ -106,7 +104,7 @@ class SocketHandler(QObject):  # Наследуемся от QObject для ис
             self.client_buffer += self.socket.readAll().data().decode('utf-8')
         except UnicodeDecodeError:
             socket_logger.error("Ошибка декодирования входящих данных (не UTF-8). Данные отброшены.", exc_info=True)
-            self.client_buffer = ""  # Очищаем буфер, чтобы избежать проблем с поврежденными данными
+            self.client_buffer = ""
             return
 
         # socket_logger.debug(f"Данные в буфере (перед обработкой split): \"{self.client_buffer.replaceHCRT()+'\n', '<NL>').replace('\r', '<CR>')}\"")
@@ -130,7 +128,7 @@ class SocketHandler(QObject):  # Наследуемся от QObject для ис
                     self.chat_history_received.emit(payload)
                 elif msg_type == "incoming_chat_message":
                     self.incoming_message_received.emit(payload)
-                elif msg_type == "initiate_direct_chat_response":  # НОВЫЙ ОБРАБОТЧИК
+                elif msg_type == "initiate_direct_chat_response":
                     self.initiate_direct_chat_response_received.emit(payload)
                 elif msg_type == "create_group_response":
                     self.create_group_response_received.emit(payload)

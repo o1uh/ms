@@ -1,29 +1,20 @@
-# server/db_handler.py
 import psycopg2
 from datetime import datetime, timezone
-import os # Для доступа к переменным окружения, если захотите
-# Можно импортировать логгер, если он нужен внутри этих функций напрямую
-# Но лучше, чтобы вызывающий код передавал логгер или обрабатывал логирование
-# Для простоты пока оставим server_logger как глобальный или передаваемый
-
-# Предположим, что server_logger будет импортирован из main_server или настроен здесь
-# Это нужно будет решить. Пока что, для функций, где он используется,
-# я закомментирую его или предположу, что он доступен.
+import os
 # import sys
 # sys.path.append(os.path.dirname(__file__)) # Если logger.py в той же папке
 # from logger import setup_logger
 # db_logger = setup_logger('DBHandler', 'db_handler_run') # Пример
 
 # --- Конфигурация БД ---
-# Лучше вынести в конфигурационный файл или переменные окружения в будущем
 DB_NAME = os.environ.get("DB_NAME", "mas_db")
 DB_USER = os.environ.get("DB_USER", "admin")
-DB_PASSWORD = os.environ.get("DB_PASSWORD", "admin") # ЗАМЕНИТЕ НА ВАШ ПАРОЛЬ ИЛИ ИСПОЛЬЗУЙТЕ ENV
+DB_PASSWORD = os.environ.get("DB_PASSWORD", "admin")
 DB_HOST = os.environ.get("DB_HOST", "localhost")
 DB_PORT = os.environ.get("DB_PORT", "5432")
 
 
-def get_db_connection(logger): # Теперь логгер передается
+def get_db_connection(logger):
     """Устанавливает и возвращает соединение с БД."""
     try:
         conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_HOST, port=DB_PORT)
@@ -206,11 +197,11 @@ def get_user_chats(conn, user_id, logger):
             for row in raw_chats:
                 chat_name_from_db = row[2]  # Исходное имя чата из БД (может быть NULL для direct)
                 chat_type = row[1]
-                other_username_val = row[6]  # <--- ИСПРАВЛЕНИЕ ЗДЕСЬ (было row[7])
+                other_username_val = row[6]
 
-                chat_name_to_display = chat_name_from_db  # По умолчанию
+                chat_name_to_display = chat_name_from_db
                 if chat_type == 'direct' and other_username_val:
-                    chat_name_to_display = other_username_val  # Для direct чата используем имя собеседника
+                    chat_name_to_display = other_username_val
 
                 chats_info.append({
                     "chat_id": row[0],
@@ -285,12 +276,6 @@ def create_group_chat_in_db(conn, group_name, creator_id, member_user_ids, logge
                 member_values = [(new_chat_id, member_id, 'member') for member_id in member_user_ids if
                                  member_id != creator_id]  # Убедимся, что создателя не добавляем дважды
                 if member_values:  # Если есть кого добавлять
-                    # psycopg2 не имеет простого INSERT ... ON CONFLICT DO NOTHING для executemany без дополнительных ухищрений
-                    # Проще будет проверить существование перед добавлением или обработать ошибку уникальности,
-                    # но для начального добавления при создании группы это не так критично, если member_user_ids уникальны.
-                    # Либо вставлять по одному в цикле с проверкой.
-                    # Пока сделаем простой INSERT. Если пользователь уже есть (чего не должно быть при создании), будет ошибка.
-                    # Или, если хотим быть более устойчивыми, можно так:
                     for member_id in member_user_ids:
                         if member_id == creator_id: continue  # Пропускаем создателя
                         try:
